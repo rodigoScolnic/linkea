@@ -165,7 +165,12 @@ function DiscoverPeople() {
             {selectedPerson.profile?.city && <p className="discover-city">{selectedPerson.profile.city}</p>}
             {selectedPerson.profile?.vocalRegister && <p className="discover-vocal-register">{selectedPerson.profile.vocalRegister}</p>}
             {selectedPerson.profile?.bio && <p className="discover-modal-bio">{selectedPerson.profile.bio}</p>}
+            {selectedPerson.profile?.gender && <p className="discover-city">Género: {selectedPerson.profile.gender}</p>}
+            {selectedPerson.profile?.experience && <p className="discover-city">Experiencia: {selectedPerson.profile.experience}</p>}
+            {selectedPerson.profile?.languages?.length > 0 && <p className="discover-city">Idiomas: {selectedPerson.profile.languages.join(", ")}</p>}
+            {selectedPerson.profile?.repertoire?.length > 0 && <div className="discover-modal-repertoire"><strong>Repertorio</strong><p>{selectedPerson.profile.repertoire.join(" · ")}</p></div>}
             {selectedPerson.profile?.interests?.length > 0 && <div className="discover-interests discover-modal-interests">{selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}</div>}
+            {selectedPerson.profile?.media?.length > 0 && <div className="discover-public-gallery"><h3>Galería</h3><div className="profile-gallery-grid">{selectedPerson.profile.media.map((item) => <div className="profile-gallery-item" key={item.id}>{item.type === "video" ? <video src={item.url} controls preload="metadata" /> : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}</div>)}</div></div>}
             {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
             <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>
           </section>
