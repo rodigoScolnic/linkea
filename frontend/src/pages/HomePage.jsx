@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
 const HomePage = () => {
-  const { user, logout } = useAuth();
+  const { user, isGuest, logout } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -17,9 +17,9 @@ const HomePage = () => {
     <main className="home-page">
       <HeaderHome />
       <div className="home-toolbar">
-        <span>Mi espacio</span>
+        <span>{isGuest ? "Modo visitante" : "Mi espacio"}</span>
         <button type="button" className="logout-button" onClick={handleLogout}>
-          Cerrar sesión
+          {isGuest ? "Salir del modo visitante" : "Cerrar sesión"}
         </button>
       </div>
       <Hero user={user} />
