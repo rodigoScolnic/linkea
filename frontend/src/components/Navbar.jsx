@@ -1,40 +1,31 @@
 import { useState } from "react";
-import "../styles/home.css"
+import "../styles/home.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <nav className="navbar">
-
-      <a href="/" className="logo">
-        MiLogo
+      <a href="/home" className="logo" onClick={closeMenu} aria-label="Linkea, inicio">
+        <span className="logo-mark">L</span>
+        <span>linkea</span>
       </a>
-
-      {/* Botón hamburguesa */}
       <button
         className={`hamburger ${menuOpen ? "active" : ""}`}
-        onClick={toggleMenu}
-        aria-label="Abrir menú"
+        onClick={() => setMenuOpen((open) => !open)}
+        aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={menuOpen}
+        aria-controls="home-navigation"
+        type="button"
       >
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
-
-      {/* Navegación */}
-      <ul className={`nav-links ${menuOpen ? "open" : ""}`}>
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/nosotros">Nosotros</a></li>
-        <li><a href="/servicios">Servicios</a></li>
-        <li><a href="/contacto">Contacto</a></li>
+      <ul id="home-navigation" className={`nav-links ${menuOpen ? "open" : ""}`}>
+        <li><a href="#mi-perfil" onClick={closeMenu}>Mi perfil</a></li>
+        <li><a href="#descubrir" onClick={closeMenu}>Descubrir</a></li>
+        <li><a href="#mis-likes" onClick={closeMenu}>Mis likes</a></li>
       </ul>
-
     </nav>
   );
 }
