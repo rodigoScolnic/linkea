@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import HeaderHome from "../components/HeaderHome";
 import Hero from "../components/Hero";
+import DiscoverPeople from "../components/DiscoverPeople";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
@@ -23,6 +24,7 @@ const HomePage = () => {
         </button>
       </div>
       <Hero user={user} />
+      <DiscoverPeople />
     </main>
   );
 };
