@@ -13,6 +13,7 @@ const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
+  const [vocalRegister, setVocalRegister] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -58,6 +59,7 @@ const AuthForm = () => {
         email: email.trim(),
         username: username.trim(),
         password: registerPassword,
+        vocalRegister,
       });
       closeRegister();
       navigate("/home", { replace: true });
@@ -189,6 +191,22 @@ const AuthForm = () => {
                 minLength={3}
                 required
               />
+              <label className="register-field-label" htmlFor="register-vocal-register">Registro vocal</label>
+              <select
+                id="register-vocal-register"
+                name="vocalRegister"
+                value={vocalRegister}
+                onChange={(event) => setVocalRegister(event.target.value)}
+                required
+              >
+                <option value="" disabled>Seleccioná tu registro vocal</option>
+                <option value="Tenor">Tenor</option>
+                <option value="Barítono">Barítono</option>
+                <option value="Bajo">Bajo</option>
+                <option value="Soprano">Soprano</option>
+                <option value="Mezzo">Mezzo</option>
+                <option value="Contralto">Contralto</option>
+              </select>
               <input
                 id="register-password"
                 name="new-password"
