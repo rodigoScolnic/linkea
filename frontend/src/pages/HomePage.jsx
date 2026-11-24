@@ -15,6 +15,30 @@ const HomePage = () => {
     navigate("/", { replace: true });
   }
 
+  if (!isGuest && user?.accountType === "INSTITUTION") {
+    const institution = user.institutionProfile;
+    return (
+      <main className="home-page">
+        <HeaderHome />
+        <div className="home-toolbar">
+          <span>Espacio institucional</span>
+          <button type="button" className="logout-button" onClick={handleLogout}>Cerrar sesión</button>
+        </div>
+        <section className="institution-welcome">
+          <span className="institution-welcome-eyebrow">LINK​​EA · INSTITUCIONES</span>
+          <h1>Bienvenida a Linkea</h1>
+          <p>Tu espacio para descubrir artistas, conectar con talentos y encontrar nuevas voces.</p>
+          <div className="institution-welcome-card">
+            <span>Perfil institucional</span>
+            <h2>{institution?.name || "Tu institución"}</h2>
+            <p>{institution?.type || "Institución cultural"}</p>
+            <small>El panel para buscar talentos estará disponible próximamente.</small>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="home-page">
       <HeaderHome />
