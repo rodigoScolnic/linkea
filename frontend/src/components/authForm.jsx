@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
 const AuthForm = () => {
-  const { login, register } = useAuth();
+  const { login, register, enterGuest } = useAuth();
   const navigate = useNavigate();
 
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -114,6 +114,17 @@ const AuthForm = () => {
             Registrate
           </button>
         </p>
+        <button
+          className="guest-button"
+          type="button"
+          onClick={() => {
+            setError("");
+            enterGuest();
+            navigate("/home", { replace: true });
+          }}
+        >
+          Entrar como visitante
+        </button>
       </section>
 
       {isRegisterOpen && (
@@ -139,7 +150,6 @@ const AuthForm = () => {
               ×
             </button>
 
-            <span className="register-modal-eyebrow">LINK<strong>EA</strong></span>
             <h2 id="register-modal-title">Creá tu cuenta</h2>
             <p className="register-modal-description">
               Empezá a conectar con nuevas personas.
