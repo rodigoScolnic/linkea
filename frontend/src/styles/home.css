@@ -425,3 +425,19 @@
   .discover-grid { grid-template-columns: 1fr; }
   .discover-card-photo { height: 230px; }
 }
+
+
+.profile-vocal-register, .discover-vocal-register {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin: 9px auto 0;
+  padding: 6px 11px;
+  border: 1px solid rgba(100, 148, 237, .28);
+  border-radius: 18px;
+  background: #f1f5ff;
+  color: #5279c8;
+  font-size: 12px;
+  font-weight: 700;
+}
+.discover-vocal-register { margin: 8px 0 0; }
