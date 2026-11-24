@@ -51,8 +51,13 @@ export const profileApi = {
 };
 
 export const discoveryApi = {
-  list: (token, limit = 20) =>
-    apiRequest(`/api/discover?limit=${limit}`, { token }),
+  list: (token, limit = 20, filters = {}) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== "" && value != null) params.set(key, String(value));
+    });
+    return apiRequest(`/api/discover?${params.toString()}`, { token });
+  },
 };
 
 export const likesApi = {
