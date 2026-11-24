@@ -367,3 +367,78 @@ body {
     font-size: 12px;
     font-weight: 700;
 }
+
+
+/* Linkea authentication screen refinements */
+.auth-page { min-height: 100svh; height: auto; }
+.auth-background { position: fixed; inset: 0; }
+.auth-page::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(8,15,34,.52), rgba(14,25,51,.3) 48%, rgba(8,14,30,.68));
+  content: "";
+}
+.auth-container {
+  min-height: 100svh;
+  padding: 36px 18px 76px;
+  gap: 8px;
+}
+.auth-logo {
+  width: min(420px, 78vw);
+  max-height: 190px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 28px rgba(0,0,0,.2));
+}
+.auth-form {
+  width: min(100%, 390px);
+  min-height: 0;
+  padding: 28px 30px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 22px;
+  background: rgba(11,19,39,.56);
+  box-shadow: 0 24px 70px rgba(0,0,0,.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.auth-form form { gap: 14px; }
+.auth-form h3 { margin-bottom: 5px; font-size: 20px; letter-spacing: -.3px; }
+.auth-form form input {
+  width: 100%;
+  height: 46px;
+  border: 1px solid rgba(176,198,245,.6);
+  background: rgba(255,255,255,.07);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.auth-form form input::placeholder { color: rgba(235,241,255,.72); font-weight: 500; }
+.auth-form form input:focus {
+  border-color: #9bb8ff;
+  background: rgba(255,255,255,.11);
+  box-shadow: 0 0 0 3px rgba(120,158,239,.18);
+}
+.auth-form form button {
+  width: 100%;
+  min-height: 46px;
+  background: linear-gradient(110deg, #7098eb, #5279c8);
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(66,102,180,.26);
+}
+.auth-form form button:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.auth-form p { line-height: 1.6; }
+.auth-form p a { padding: 2px 7px; }
+.auth-form .guest-button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+}
+.auth-page footer { position: absolute; bottom: 0; z-index: 2; width: 100%; padding: 12px; }
+#footerP { position: static; }
+@media (max-width: 480px) {
+  .auth-container { justify-content: center; padding: 24px 16px 68px; }
+  .auth-logo { width: min(310px, 76vw); max-height: 145px; }
+  .auth-form { padding: 24px 19px; border-radius: 18px; }
+  .auth-form h3 { font-size: 18px; }
+}
