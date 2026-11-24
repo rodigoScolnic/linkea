@@ -7,6 +7,7 @@ const TOKEN_KEY = "linkea_token";
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
   const [user, setUser] = useState(null);
+  const [isGuest, setIsGuest] = useState(() => sessionStorage.getItem("linkea_guest") === "true");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -41,6 +42,8 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   function saveSession(response) {
+    sessionStorage.removeItem("linkea_guest");
+    setIsGuest(false);
     localStorage.setItem(TOKEN_KEY, response.token);
     setUser(response.user);
     setToken(response.token);
@@ -58,7 +61,14 @@ export function AuthProvider({ children }) {
     return response.user;
   }
 
+  function enterGuest() {
+    sessionStorage.setItem("linkea_guest", "true");
+    setIsGuest(true);
+  }
+
   function logout() {
+    sessionStorage.removeItem("linkea_guest");
+    setIsGuest(false);
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
@@ -72,7 +82,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, token, loading, isGuest, enterGuest, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
