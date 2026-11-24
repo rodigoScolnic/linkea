@@ -342,3 +342,28 @@ body {
 .guest-preview .profile-bio {
     max-width: 340px;
 }
+
+
+.register-modal-form select {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid rgba(100, 148, 237, .65);
+    border-radius: 9px;
+    outline: none;
+    background: #17223d;
+    color: white;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+.register-modal-form select:focus {
+    border-color: greenyellow;
+    box-shadow: 0 0 0 3px rgba(173, 255, 47, .1);
+}
+.register-field-label {
+    margin: 2px 0 -7px;
+    color: rgba(255,255,255,.82);
+    font-size: 12px;
+    font-weight: 700;
+}
