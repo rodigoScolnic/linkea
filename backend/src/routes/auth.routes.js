@@ -5,9 +5,11 @@ import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 const router = Router();
+const vocalRegisters = ["Tenor", "Barítono", "Bajo", "Soprano", "Mezzo", "Contralto"];
 const registerSchema = z.object({
   email: z.string().email().max(254), username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.-]+$/),
-  password: z.string().min(8).max(72), displayName: z.string().min(2).max(60)
+  password: z.string().min(8).max(72), displayName: z.string().min(2).max(60),
+  vocalRegister: z.enum(vocalRegisters)
 });
 const loginSchema = z.object({ identifier: z.string().min(1), password: z.string().min(1) });
 const tokenFor = user => jwt.sign({}, process.env.JWT_SECRET, { subject: user.id, expiresIn: process.env.JWT_EXPIRES_IN || "7d" });
@@ -18,7 +20,7 @@ router.post("/register", async (req, res, next) => {
     const passwordHash = await bcrypt.hash(data.password, 12);
     const user = await prisma.user.create({
       data: { email: data.email.toLowerCase(), username: data.username.toLowerCase(), passwordHash,
-        profile: { create: { displayName: data.displayName } } }, include: { profile: true }
+        profile: { create: { displayName: data.displayName, vocalRegister: data.vocalRegister } } }, include: { profile: true }
     });
     res.status(201).json({ user: safeUser(user), token: tokenFor(user) });
   } catch (error) { next(error); }
