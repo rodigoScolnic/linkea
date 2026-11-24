@@ -442,3 +442,13 @@ body {
   .auth-form { padding: 24px 19px; border-radius: 18px; }
   .auth-form h3 { font-size: 18px; }
 }
+
+
+/* Selector de tipo de cuenta */
+.account-type-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 0 0 17px; }
+.account-type-option { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 5px; padding: 13px 8px; border: 1px solid rgba(176,198,245,.28); border-radius: 13px; background: rgba(255,255,255,.045); color: rgba(255,255,255,.78); font: inherit; cursor: pointer; transition: .2s ease; }
+.account-type-option:hover { border-color: rgba(143,174,244,.75); background: rgba(100,148,237,.1); }
+.account-type-option.active { border-color: #83a8f5; background: rgba(100,148,237,.18); color: #fff; box-shadow: 0 0 0 2px rgba(100,148,237,.12); }
+.account-type-option strong { font-size: 12px; }
+.account-type-option small { color: rgba(235,241,255,.62); font-size: 10px; text-align: center; }
+.account-type-icon { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 9px; background: rgba(130,164,239,.16); color: #a9c2ff; font-size: 20px; }
