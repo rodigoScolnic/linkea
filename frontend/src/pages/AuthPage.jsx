@@ -7,12 +7,12 @@ import logo from "../assets/images/logo.png";
 import "../styles/auth.css";
 
 const AuthPage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && user) navigate("/home", { replace: true });
-  }, [loading, user, navigate]);
+    if (!loading && (user || isGuest)) navigate("/home", { replace: true });
+  }, [loading, user, isGuest, navigate]);
 
   return (
     <main className="auth-page">
