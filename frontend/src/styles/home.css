@@ -208,3 +208,45 @@
     padding: 24px 18px;
   }
 }
+
+
+.profile-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-photo-button {
+  border: 1px solid cornflowerblue;
+  border-radius: 8px;
+  padding: 7px 12px;
+  color: cornflowerblue;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.profile-photo-button:hover:not(:disabled) {
+  color: white;
+  background: cornflowerblue;
+}
+
+.profile-photo-button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.profile-photo-input {
+  display: none;
+}
+
+.profile-photo-error {
+  margin-top: 10px;
+  color: #c0392b;
+  font-size: 12px;
+  text-align: center;
+}
