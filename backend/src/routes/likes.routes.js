@@ -2,6 +2,31 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 const router = Router();
+router.get("/", requireAuth, async (req, res, next) => {
+  try {
+    const likes = await prisma.like.findMany({
+      where: { fromUserId: req.user.id },
+      orderBy: { createdAt: "desc" },
+      include: {
+        toUser: {
+          select: {
+            id: true,
+            username: true,
+            profile: {
+              select: {
+                displayName: true,
+                photoUrl: true,
+                city: true,
+                vocalRegister: true
+              }
+            }
+          }
+        }
+      }
+    });
+    res.json({ likes });
+  } catch (error) { next(error); }
+});
 router.post("/:userId", requireAuth, async (req, res, next) => {
   try {
     const userId = req.params.userId;
