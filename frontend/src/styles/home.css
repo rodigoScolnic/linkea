@@ -583,3 +583,9 @@
 .profile-gallery-empty { margin-top: 14px; padding: 18px; border: 1px dashed #d9e1f2; border-radius: 10px; color: #888; font-size: 13px; text-align: center; }
 .profile-success { margin-top: 12px; color: #39734a; font-size: 13px; }
 @media (max-width: 560px) { .profile-edit-form { grid-template-columns: 1fr; } .profile-gallery-heading { align-items: flex-start; flex-direction: column; } .profile-gallery-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+.discover-modal-repertoire { margin: 14px 0; color: #555; font-size: 13px; text-align: left; }
+.discover-modal-repertoire p { margin-top: 5px; line-height: 1.6; }
+.discover-public-gallery { margin-top: 22px; text-align: left; }
+.discover-public-gallery h3 { margin: 0; font-size: 17px; }
+.discover-public-gallery .profile-gallery-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
