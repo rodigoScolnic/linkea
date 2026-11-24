@@ -48,7 +48,8 @@ export const profileApi = {
     return data;
   },
   deleteMedia: (token, mediaId) =>
-    apiRequest(`/api/profile/media/${encodeURIComponent(mediaId)}`, { method: "DELETE", token }),\n  uploadPhoto: async (token, file) => {
+    apiRequest(`/api/profile/media/${encodeURIComponent(mediaId)}`, { method: "DELETE", token }),
+  uploadPhoto: async (token, file) => {
     const response = await fetch(`${API_URL}/api/profile/photo`, {
       method: "PUT",
       headers: {
