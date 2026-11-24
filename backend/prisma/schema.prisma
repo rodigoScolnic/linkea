@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  username String @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profile Profile?
+  likesSent Like[] @relation("LikesSent")
+  likesReceived Like[] @relation("LikesReceived")
+  matchesA Match[] @relation("MatchUserA")
+  matchesB Match[] @relation("MatchUserB")
+  messages Message[]
+}
+model Profile {
+  id String @id @default(uuid())
+  userId String @unique
+  displayName String
+  bio String? @db.VarChar(500)
+  birthDate DateTime?
+  city String?
+  interests String[] @default([])
+  photoUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model Like {
+  id String @id @default(uuid())
+  fromUserId String
+  toUserId String
+  createdAt DateTime @default(now())
+  fromUser User @relation("LikesSent", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser User @relation("LikesReceived", fields: [toUserId], references: [id], onDelete: Cascade)
+  @@unique([fromUserId, toUserId])
+  @@index([toUserId])
+}
+model Match {
+  id String @id @default(uuid())
+  userAId String
+  userBId String
+  createdAt DateTime @default(now())
+  userA User @relation("MatchUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB User @relation("MatchUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  conversation Conversation?
+  @@unique([userAId, userBId])
+}
+model Conversation {
+  id String @id @default(uuid())
+  matchId String @unique
+  createdAt DateTime @default(now())
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  messages Message[]
+}
+model Message {
+  id String @id @default(uuid())
+  conversationId String
+  senderId String
+  content String @db.VarChar(2000)
+  createdAt DateTime @default(now())
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  @@index([conversationId, createdAt])
+}
