@@ -87,7 +87,7 @@ const Hero = ({ user }) => {
   }
 
   return (
-    <section className="hero">
+    <section className="hero" id="mi-perfil">
       <article className="profile-preview profile-preview-expanded">
         <div className="profile-avatar-wrap">
           <img className="profile-avatar" src={profile.photoUrl || gUser} alt={`Foto de perfil de ${displayName}`} />
