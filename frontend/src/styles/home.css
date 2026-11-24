@@ -441,3 +441,39 @@
   font-weight: 700;
 }
 .discover-vocal-register { margin: 8px 0 0; }
+
+
+/* Accion de like en perfiles */
+.discover-like-button {
+  width: 100%;
+  margin-top: 9px;
+  padding: 11px 14px;
+  border: 1px solid #e58aa8;
+  border-radius: 9px;
+  background: #fff5f8;
+  color: #c94f78;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.discover-like-button:hover:not(:disabled) {
+  background: #c94f78;
+  border-color: #c94f78;
+  color: #fff;
+}
+.discover-like-button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+.discover-modal-like-button { margin-top: 20px; }
+.discover-like-notice {
+  margin: 0 0 18px;
+  padding: 12px 15px;
+  border: 1px solid #d9e8dc;
+  border-radius: 10px;
+  background: #f3faf4;
+  color: #39734a;
+  font-size: 14px;
+}
