@@ -14,7 +14,7 @@ router.get("/", requireAuth, async (req, res, next) => {
       select: {
         id: true,
         username: true,
-        profile: { select: { displayName: true, bio: true, city: true, interests: true, photoUrl: true } }
+        profile: { select: { displayName: true, bio: true, city: true, vocalRegister: true, interests: true, photoUrl: true } }
       },
       take,
       orderBy: { createdAt: "desc" }
