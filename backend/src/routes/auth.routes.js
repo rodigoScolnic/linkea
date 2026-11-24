@@ -20,7 +20,7 @@ router.post("/register", async (req, res, next) => {
     const passwordHash = await bcrypt.hash(data.password, 12);
     const user = await prisma.user.create({
       data: { email: data.email.toLowerCase(), username: data.username.toLowerCase(), passwordHash,
-        profile: { create: { displayName: data.displayName, vocalRegister: data.vocalRegister } } }, include: { profile: true }
+        profile: { create: { displayName: data.displayName, vocalRegister: data.vocalRegister } } }, include: { profile: { include: { media: { orderBy: { createdAt: "desc" } } } } }
     });
     res.status(201).json({ user: safeUser(user), token: tokenFor(user) });
   } catch (error) { next(error); }
@@ -29,14 +29,14 @@ router.post("/login", async (req, res, next) => {
   try {
     const { identifier, password } = loginSchema.parse(req.body);
     const value = identifier.toLowerCase();
-    const user = await prisma.user.findFirst({ where: { OR: [{ email: value }, { username: value }] }, include: { profile: true } });
+    const user = await prisma.user.findFirst({ where: { OR: [{ email: value }, { username: value }] }, include: { profile: { include: { media: { orderBy: { createdAt: "desc" } } } } } });
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) return res.status(401).json({ error: "Usuario o contraseña incorrectos." });
     res.json({ user: safeUser(user), token: tokenFor(user) });
   } catch (error) { next(error); }
 });
 router.get("/me", requireAuth, async (req, res, next) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { id: true, email: true, username: true, createdAt: true, profile: true } });
+    const user = await prisma.user.findUnique({ where: { id: req.user.id }, select: { id: true, email: true, username: true, createdAt: true, profile: { include: { media: { orderBy: { createdAt: "desc" } } } } } });
     if (!user) return res.status(404).json({ error: "Usuario no encontrado." });
     res.json({ user });
   } catch (error) { next(error); }
