@@ -8,6 +8,7 @@ import { requireAuth } from "../middleware/auth.js";
 const router = Router();
 const schema = z.object({
   displayName: z.string().min(2).max(60),
+  vocalRegister: z.enum(["Tenor", "Barítono", "Bajo", "Soprano", "Mezzo", "Contralto"]).nullable().optional(),
   bio: z.string().max(500).nullable().optional(),
   city: z.string().max(100).nullable().optional(),
   birthDate: z.string().datetime().nullable().optional(),
