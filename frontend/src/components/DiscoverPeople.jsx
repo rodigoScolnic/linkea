@@ -3,6 +3,8 @@ import { discoveryApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
+const initialFilters = { vocalRegister: "", minAge: "", maxAge: "", city: "" };
+
 function DiscoverPeople() {
   const { token, isGuest } = useAuth();
   const [people, setPeople] = useState([]);
@@ -12,19 +14,17 @@ function DiscoverPeople() {
   const [likeError, setLikeError] = useState("");
   const [notice, setNotice] = useState("");
   const [likingIds, setLikingIds] = useState([]);
+  const [filters, setFilters] = useState(initialFilters);
+  const [appliedFilters, setAppliedFilters] = useState(initialFilters);
 
   useEffect(() => {
     let active = true;
-
     async function loadPeople() {
-      if (!token || isGuest) {
-        setLoading(false);
-        return;
-      }
-
+      if (!token || isGuest) { setLoading(false); return; }
       try {
+        setLoading(true);
         setError("");
-        const response = await discoveryApi.list(token);
+        const response = await discoveryApi.list(token, 20, appliedFilters);
         if (active) setPeople(response.users || []);
       } catch (err) {
         if (active) setError(err.message || "No pudimos cargar los perfiles.");
@@ -32,20 +32,33 @@ function DiscoverPeople() {
         if (active) setLoading(false);
       }
     }
-
     loadPeople();
     return () => { active = false; };
-  }, [token, isGuest]);
+  }, [token, isGuest, appliedFilters]);
+
+  function updateFilter(event) {
+    const { name, value } = event.target;
+    setFilters((current) => ({ ...current, [name]: value }));
+  }
+
+  function applyFilters(event) {
+    event.preventDefault();
+    setError("");
+    setAppliedFilters({ ...filters });
+  }
+
+  function clearFilters() {
+    setFilters(initialFilters);
+    setAppliedFilters(initialFilters);
+  }
 
   async function handleLike(person) {
     if (!token || likingIds.includes(person.id)) return;
-
     try {
       setLikeError("");
       setNotice("");
       setLikingIds((current) => [...current, person.id]);
       const response = await likesApi.like(token, person.id);
-
       setPeople((current) => current.filter((item) => item.id !== person.id));
       setSelectedPerson(null);
       setNotice(response.matched
@@ -66,66 +79,74 @@ function DiscoverPeople() {
           <h2>Descubrí perfiles</h2>
           <p className="discover-subtitle">Personas que ya forman parte de Linkea.</p>
         </div>
-        {!loading && !error && (
-          <span className="discover-count">{people.length} {people.length === 1 ? "perfil" : "perfiles"}</span>
-        )}
+        {!loading && !error && <span className="discover-count">{people.length} {people.length === 1 ? "perfil" : "perfiles"}</span>}
       </div>
+
+      {!isGuest && (
+        <form className="discover-filters" onSubmit={applyFilters}>
+          <div className="discover-filters-heading">
+            <h3>Filtrar perfiles</h3>
+            <span>Encontrá personas según tus preferencias</span>
+          </div>
+          <div className="discover-filter-fields">
+            <label>
+              Registro vocal
+              <select name="vocalRegister" value={filters.vocalRegister} onChange={updateFilter}>
+                <option value="">Todos los registros</option>
+                {["Tenor", "Barítono", "Bajo", "Soprano", "Mezzo", "Contralto"].map((register) => <option key={register} value={register}>{register}</option>)}
+              </select>
+            </label>
+            <label>
+              Edad mínima
+              <input name="minAge" type="number" min="18" max="100" placeholder="Desde" value={filters.minAge} onChange={updateFilter} />
+            </label>
+            <label>
+              Edad máxima
+              <input name="maxAge" type="number" min="18" max="100" placeholder="Hasta" value={filters.maxAge} onChange={updateFilter} />
+            </label>
+            <label>
+              Ciudad o localidad
+              <input name="city" type="text" maxLength="80" placeholder="Ej. San Martín" value={filters.city} onChange={updateFilter} />
+            </label>
+          </div>
+          <div className="discover-filter-actions">
+            <button type="submit" className="discover-filter-apply">Aplicar filtros</button>
+            <button type="button" className="discover-filter-clear" onClick={clearFilters}>Limpiar</button>
+          </div>
+        </form>
+      )}
 
       {notice && <p className="discover-like-notice" role="status">{notice}</p>}
       {likeError && !selectedPerson && <p className="discover-status discover-error" role="alert">{likeError}</p>}
 
       {isGuest ? (
-        <div className="discover-message">
-          <h3>Creá tu cuenta para descubrir personas</h3>
-          <p>Registrate o iniciá sesión para ver perfiles y empezar a conectar.</p>
-        </div>
+        <div className="discover-message"><h3>Creá tu cuenta para descubrir personas</h3><p>Registrate o iniciá sesión para ver perfiles y empezar a conectar.</p></div>
       ) : loading ? (
         <p className="discover-status">Buscando perfiles...</p>
       ) : error ? (
         <p className="discover-status discover-error" role="alert">{error}</p>
       ) : people.length === 0 ? (
-        <div className="discover-message">
-          <h3>Por ahora no hay más perfiles</h3>
-          <p>Cuando se sumen nuevas personas, vas a poder descubrirlas acá.</p>
-        </div>
+        <div className="discover-message"><h3>No encontramos perfiles con esos filtros</h3><p>Probá cambiar los criterios o limpiar los filtros para ver más personas.</p></div>
       ) : (
         <div className="discover-grid">
           {people.map((person) => {
             const profile = person.profile || {};
             const name = profile.displayName || person.username;
             const isLiking = likingIds.includes(person.id);
+            const age = profile.birthDate ? Math.floor((Date.now() - new Date(profile.birthDate).getTime()) / 31557600000) : null;
             return (
               <article className="discover-card" key={person.id}>
-                <img
-                  className="discover-card-photo"
-                  src={profile.photoUrl || genericUser}
-                  alt={`Foto de ${name}`}
-                  loading="lazy"
-                />
+                <img className="discover-card-photo" src={profile.photoUrl || genericUser} alt={`Foto de ${name}`} loading="lazy" />
                 <div className="discover-card-content">
                   <h3>{name}</h3>
                   <p className="discover-username">@{person.username}</p>
+                  {age !== null && <p className="discover-city">{age} años</p>}
                   {profile.city && <p className="discover-city">{profile.city}</p>}
                   {profile.vocalRegister && <p className="discover-vocal-register">{profile.vocalRegister}</p>}
                   {profile.bio && <p className="discover-bio">{profile.bio}</p>}
-                  {profile.interests?.length > 0 && (
-                    <div className="discover-interests">
-                      {profile.interests.slice(0, 3).map((interest) => (
-                        <span key={interest}>{interest}</span>
-                      ))}
-                    </div>
-                  )}
-                  <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>
-                    Ver perfil
-                  </button>
-                  <button
-                    type="button"
-                    className="discover-like-button"
-                    onClick={() => handleLike(person)}
-                    disabled={isLiking}
-                  >
-                    {isLiking ? "Enviando..." : "♥ Me gusta"}
-                  </button>
+                  {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
+                  <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>Ver perfil</button>
+                  <button type="button" className="discover-like-button" onClick={() => handleLike(person)} disabled={isLiking}>{isLiking ? "Enviando..." : "♥ Me gusta"}</button>
                 </div>
               </article>
             );
@@ -135,41 +156,18 @@ function DiscoverPeople() {
 
       {selectedPerson && (
         <div className="discover-modal-backdrop" role="presentation" onClick={() => setSelectedPerson(null)}>
-          <section
-            className="discover-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="discover-modal-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button className="discover-modal-close" type="button" onClick={() => setSelectedPerson(null)} aria-label="Cerrar">
-              ×
-            </button>
-            <img
-              className="discover-modal-photo"
-              src={selectedPerson.profile?.photoUrl || genericUser}
-              alt={`Foto de ${selectedPerson.profile?.displayName || selectedPerson.username}`}
-            />
+          <section className="discover-modal" role="dialog" aria-modal="true" aria-labelledby="discover-modal-title" onClick={(event) => event.stopPropagation()}>
+            <button className="discover-modal-close" type="button" onClick={() => setSelectedPerson(null)} aria-label="Cerrar">×</button>
+            <img className="discover-modal-photo" src={selectedPerson.profile?.photoUrl || genericUser} alt={`Foto de ${selectedPerson.profile?.displayName || selectedPerson.username}`} />
             <p className="discover-eyebrow">Perfil de Linkea</p>
             <h2 id="discover-modal-title">{selectedPerson.profile?.displayName || selectedPerson.username}</h2>
             <p className="discover-username">@{selectedPerson.username}</p>
             {selectedPerson.profile?.city && <p className="discover-city">{selectedPerson.profile.city}</p>}
             {selectedPerson.profile?.vocalRegister && <p className="discover-vocal-register">{selectedPerson.profile.vocalRegister}</p>}
             {selectedPerson.profile?.bio && <p className="discover-modal-bio">{selectedPerson.profile.bio}</p>}
-            {selectedPerson.profile?.interests?.length > 0 && (
-              <div className="discover-interests discover-modal-interests">
-                {selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}
-              </div>
-            )}
+            {selectedPerson.profile?.interests?.length > 0 && <div className="discover-interests discover-modal-interests">{selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}</div>}
             {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
-            <button
-              type="button"
-              className="discover-like-button discover-modal-like-button"
-              onClick={() => handleLike(selectedPerson)}
-              disabled={likingIds.includes(selectedPerson.id)}
-            >
-              {likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}
-            </button>
+            <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>
           </section>
         </div>
       )}
