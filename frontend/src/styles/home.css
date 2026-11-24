@@ -902,3 +902,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+
+/* Bienvenida inicial para cuentas institucionales */
+.institution-welcome { width: min(760px, calc(100% - 40px)); margin: 90px auto; text-align: center; color: var(--linkea-ink); }
+.institution-welcome-eyebrow { color: var(--linkea-blue-dark); font-size: 11px; font-weight: 800; letter-spacing: 1.5px; }
+.institution-welcome h1 { margin: 12px 0; font-size: clamp(30px,5vw,42px); letter-spacing: -1.2px; }
+.institution-welcome > p { max-width: 540px; margin: 0 auto; color: var(--linkea-muted); line-height: 1.7; }
+.institution-welcome-card { margin: 34px auto 0; padding: 30px; border: 1px solid var(--linkea-line); border-radius: 22px; background: #fff; box-shadow: 0 14px 40px rgba(36,52,84,.055); }
+.institution-welcome-card > span { color: var(--linkea-blue-dark); font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.institution-welcome-card h2 { margin: 10px 0 4px; font-size: 25px; }
+.institution-welcome-card p { color: var(--linkea-muted); }
+.institution-welcome-card small { display: block; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--linkea-line); color: var(--linkea-muted); }
