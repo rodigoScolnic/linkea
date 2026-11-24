@@ -589,3 +589,59 @@
 .discover-public-gallery { margin-top: 22px; text-align: left; }
 .discover-public-gallery h3 { margin: 0; font-size: 17px; }
 .discover-public-gallery .profile-gallery-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+
+
+/* Historial de likes enviados */
+.likes-history-section {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto 76px;
+  color: #222;
+}
+.likes-history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+.likes-history-heading h2 { margin: 0; font-size: clamp(24px, 4vw, 32px); }
+.likes-history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+}
+.likes-history-card {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #ededed;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 7px 22px rgba(0,0,0,.045);
+}
+.likes-history-card > img {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #f4f6fb;
+}
+.likes-history-card-content { min-width: 0; }
+.likes-history-card-content h3 {
+  overflow: hidden;
+  margin: 0;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.likes-history-card-content .discover-username { margin: 3px 0 0; }
+.likes-history-card-content .discover-city { margin-top: 4px; }
+.likes-history-card-content .discover-vocal-register { margin-top: 6px; font-size: 10px; }
+.likes-history-date { margin: 7px 0 0; color: #999; font-size: 10px; }
+@media (max-width: 600px) {
+  .likes-history-section { width: calc(100% - 32px); }
+  .likes-history-grid { grid-template-columns: 1fr; gap: 11px; }
+}
