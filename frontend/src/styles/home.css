@@ -477,3 +477,81 @@
   color: #39734a;
   font-size: 14px;
 }
+
+
+/* Filtros de busqueda de perfiles */
+.discover-filters {
+  margin: 0 0 24px;
+  padding: 20px;
+  border: 1px solid #e9edf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 7px 22px rgba(0,0,0,.035);
+}
+.discover-filters-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.discover-filters-heading h3 { margin: 0; font-size: 16px; }
+.discover-filters-heading span { color: #888; font-size: 12px; }
+.discover-filter-fields {
+  display: grid;
+  grid-template-columns: 1.25fr .7fr .7fr 1.25fr;
+  gap: 12px;
+}
+.discover-filter-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+}
+.discover-filter-fields input,
+.discover-filter-fields select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 1px solid #dfe5ef;
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: #333;
+  font: inherit;
+  font-size: 13px;
+}
+.discover-filter-fields input:focus,
+.discover-filter-fields select:focus {
+  border-color: cornflowerblue;
+  box-shadow: 0 0 0 3px rgba(100,149,237,.12);
+}
+.discover-filter-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 16px;
+}
+.discover-filter-apply,
+.discover-filter-clear {
+  padding: 9px 15px;
+  border: 1px solid cornflowerblue;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.discover-filter-apply { background: cornflowerblue; color: #fff; }
+.discover-filter-apply:hover { background: #5279c8; }
+.discover-filter-clear { background: #fff; color: cornflowerblue; }
+.discover-filter-clear:hover { background: #f1f5ff; }
+@media (max-width: 760px) {
+  .discover-filter-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 420px) {
+  .discover-filters { padding: 15px; }
+  .discover-filters-heading { display: block; }
+  .discover-filters-heading span { display: block; margin-top: 4px; }
+  .discover-filter-fields { grid-template-columns: 1fr; }
+}
