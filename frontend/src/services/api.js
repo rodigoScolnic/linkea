@@ -33,6 +33,21 @@ export const profileApi = {
   get: (token) => apiRequest("/api/profile", { token }),
   update: (token, profile) =>
     apiRequest("/api/profile", { method: "PUT", token, body: profile }),
+  uploadPhoto: async (token, file) => {
+    const response = await fetch(`${API_URL}/api/profile/photo`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": file.type,
+      },
+      body: file,
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(data?.error || "No se pudo subir la foto.");
+    }
+    return data;
+  },
 };
 
 export const discoveryApi = {
