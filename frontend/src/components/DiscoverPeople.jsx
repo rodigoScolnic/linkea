@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { discoveryApi } from "../services/api";
+import { discoveryApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
@@ -9,6 +9,9 @@ function DiscoverPeople() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [likeError, setLikeError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [likingIds, setLikingIds] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -34,6 +37,27 @@ function DiscoverPeople() {
     return () => { active = false; };
   }, [token, isGuest]);
 
+  async function handleLike(person) {
+    if (!token || likingIds.includes(person.id)) return;
+
+    try {
+      setLikeError("");
+      setNotice("");
+      setLikingIds((current) => [...current, person.id]);
+      const response = await likesApi.like(token, person.id);
+
+      setPeople((current) => current.filter((item) => item.id !== person.id));
+      setSelectedPerson(null);
+      setNotice(response.matched
+        ? `¡Es un match con @${person.username}! Ya pueden empezar a conversar.`
+        : `¡Le diste like a @${person.username}!`);
+    } catch (err) {
+      setLikeError(err.message || "No pudimos enviar el like. Intentá nuevamente.");
+    } finally {
+      setLikingIds((current) => current.filter((id) => id !== person.id));
+    }
+  }
+
   return (
     <section className="discover-section" id="descubrir">
       <div className="discover-heading">
@@ -46,6 +70,9 @@ function DiscoverPeople() {
           <span className="discover-count">{people.length} {people.length === 1 ? "perfil" : "perfiles"}</span>
         )}
       </div>
+
+      {notice && <p className="discover-like-notice" role="status">{notice}</p>}
+      {likeError && !selectedPerson && <p className="discover-status discover-error" role="alert">{likeError}</p>}
 
       {isGuest ? (
         <div className="discover-message">
@@ -66,6 +93,7 @@ function DiscoverPeople() {
           {people.map((person) => {
             const profile = person.profile || {};
             const name = profile.displayName || person.username;
+            const isLiking = likingIds.includes(person.id);
             return (
               <article className="discover-card" key={person.id}>
                 <img
@@ -87,8 +115,16 @@ function DiscoverPeople() {
                       ))}
                     </div>
                   )}
-                  <button type="button" className="discover-view-button" onClick={() => setSelectedPerson(person)}>
+                  <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>
                     Ver perfil
+                  </button>
+                  <button
+                    type="button"
+                    className="discover-like-button"
+                    onClick={() => handleLike(person)}
+                    disabled={isLiking}
+                  >
+                    {isLiking ? "Enviando..." : "♥ Me gusta"}
                   </button>
                 </div>
               </article>
@@ -125,6 +161,15 @@ function DiscoverPeople() {
                 {selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}
               </div>
             )}
+            {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
+            <button
+              type="button"
+              className="discover-like-button discover-modal-like-button"
+              onClick={() => handleLike(selectedPerson)}
+              disabled={likingIds.includes(selectedPerson.id)}
+            >
+              {likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}
+            </button>
           </section>
         </div>
       )}
