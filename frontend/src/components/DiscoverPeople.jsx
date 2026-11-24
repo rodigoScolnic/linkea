@@ -78,6 +78,7 @@ function DiscoverPeople() {
                   <h3>{name}</h3>
                   <p className="discover-username">@{person.username}</p>
                   {profile.city && <p className="discover-city">{profile.city}</p>}
+                  {profile.vocalRegister && <p className="discover-vocal-register">{profile.vocalRegister}</p>}
                   {profile.bio && <p className="discover-bio">{profile.bio}</p>}
                   {profile.interests?.length > 0 && (
                     <div className="discover-interests">
@@ -117,6 +118,7 @@ function DiscoverPeople() {
             <h2 id="discover-modal-title">{selectedPerson.profile?.displayName || selectedPerson.username}</h2>
             <p className="discover-username">@{selectedPerson.username}</p>
             {selectedPerson.profile?.city && <p className="discover-city">{selectedPerson.profile.city}</p>}
+            {selectedPerson.profile?.vocalRegister && <p className="discover-vocal-register">{selectedPerson.profile.vocalRegister}</p>}
             {selectedPerson.profile?.bio && <p className="discover-modal-bio">{selectedPerson.profile.bio}</p>}
             {selectedPerson.profile?.interests?.length > 0 && (
               <div className="discover-interests discover-modal-interests">
