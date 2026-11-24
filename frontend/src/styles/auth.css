@@ -214,15 +214,6 @@ body {
     border-color: cornflowerblue;
 }
 
-.register-modal-eyebrow {
-    display: block;
-    margin-bottom: 12px;
-    color: #a9c2ff;
-    font-size: 12px;
-    letter-spacing: 4px;
-    text-align: center;
-}
-
 .register-modal h2 {
     color: white;
     font-size: 25px;
@@ -322,4 +313,32 @@ body {
     .register-modal h2 {
         font-size: 22px;
     }
+}
+
+
+/* Acceso de visitante */
+.auth-form .guest-button {
+    width: 300px;
+    max-width: 85vw;
+    min-height: 40px;
+    margin-top: 12px;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .06);
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .25s ease;
+}
+
+.auth-form .guest-button:hover {
+    border-color: cornflowerblue;
+    background: rgba(100, 148, 237, .2);
+    transform: translateY(-1px);
+}
+
+.guest-preview .profile-bio {
+    max-width: 340px;
 }
