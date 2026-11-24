@@ -77,6 +77,7 @@ export const discoveryApi = {
 };
 
 export const likesApi = {
+  listSent: (token) => apiRequest("/api/likes", { token }),
   like: (token, userId) =>
     apiRequest(`/api/likes/${encodeURIComponent(userId)}`, { method: "POST", token }),
   unlike: (token, userId) =>
