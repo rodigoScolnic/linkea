@@ -33,7 +33,7 @@ export const profileApi = {
   get: (token) => apiRequest("/api/profile", { token }),
   update: (token, profile) =>
     apiRequest("/api/profile", { method: "PUT", token, body: profile }),
-  uploadPhoto: async (token, file) => {
+  uploadMedia: async (token, file) => {\n    const response = await fetch(`${API_URL}/api/profile/media`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": file.type, "X-File-Name": encodeURIComponent(file.name) }, body: file });\n    const data = await response.json().catch(() => null);\n    if (!response.ok) throw new Error(data?.error || "No se pudo subir el archivo.");\n    return data;\n  },\n  deleteMedia: (token, mediaId) => apiRequest(`/api/profile/media/${encodeURIComponent(mediaId)}`, { method: "DELETE", token }),\n  uploadPhoto: async (token, file) => {
     const response = await fetch(`${API_URL}/api/profile/photo`, {
       method: "PUT",
       headers: {
