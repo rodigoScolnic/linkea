@@ -88,6 +88,7 @@ const Hero = ({ user }) => {
           <p className="profile-username">@{user?.username}</p>
 
           {profile?.city && <p className="profile-city">{profile.city}</p>}
+          {profile?.vocalRegister && <p className="profile-vocal-register">Registro vocal: <strong>{profile.vocalRegister}</strong></p>}
           {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
 
           {interests.length > 0 && (
