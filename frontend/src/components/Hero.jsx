@@ -21,7 +21,7 @@ const Hero = ({ user }) => {
   const [deletingMedia, setDeletingMedia] = useState("");
 
   if (!user) return (
-    <section className="hero"><article className="profile-preview guest-preview">
+    <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
       <img className="profile-avatar" src={gUser} alt="Perfil de visitante" />
       <div className="profile-content"><p className="profile-eyebrow">Modo visitante</p><h1>¡Bienvenido a Linkea!</h1>
         <p className="profile-bio">Estás explorando Linkea como visitante. Creá una cuenta o iniciá sesión para completar tu perfil y empezar a conectar.</p>
