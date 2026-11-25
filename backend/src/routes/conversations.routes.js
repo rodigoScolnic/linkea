@@ -3,7 +3,7 @@ import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 const router = Router();
-const access = (id, userId) => prisma.conversation.findFirst({ where: { id, match: { OR: [{ userAId: userId }, { userBId: userId }] } } });
+const participantFilter = (userId) => ({ OR: [{ match: { is: { OR: [{ userAId: userId }, { userBId: userId }] } } }, { invitation: { is: { OR: [{ institutionId: userId }, { talentId: userId }] } } }] });\nconst access = (id, userId) => prisma.conversation.findFirst({ where: { id, ...participantFilter(userId) } });
 router.get("/", requireAuth, async (req, res, next) => {
   try {
     const conversations = await prisma.conversation.findMany({
