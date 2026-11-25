@@ -91,9 +91,6 @@ export function initializeSocket(server) {
           content: z.string().trim().min(1).max(2000)
         }).parse(payload);
         const room = `conversation:${parsed.conversationId}`;
-        if (!socket.rooms.has(room)) {
-          return acknowledge({ ok: false, error: "Primero tenés que abrir la conversación." });
-        }
         const conversation = await getConversationForUser(parsed.conversationId, userId);
         if (!conversation) return acknowledge({ ok: false, error: "Conversación no encontrada." });
         const recipientId = getOtherParticipant(conversation, userId);
