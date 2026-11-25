@@ -33,7 +33,7 @@ function Navbar() {
           </a>
         </li>
         {!isGuest && <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>}
-        {!isGuest && <li><a href="#oportunidades" onClick={closeMenu}>Oportunidades</a></li>
+        {!isGuest && <li><a href="#oportunidades" onClick={closeMenu}>Oportunidades</a></li>}
         {!isGuest && <li><a href="#notificaciones" onClick={closeMenu}>Notificaciones</a></li>}
       </ul>
     </nav>
