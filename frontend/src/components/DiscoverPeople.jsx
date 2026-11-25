@@ -252,9 +252,9 @@ function DiscoverPeople() {
       )}
 
       {selectedPerson && (
-        <div className="discover-modal-backdrop" role="presentation" onClick={() => setSelectedPerson(null)}>
+        <div className="discover-modal-backdrop" role="presentation" onClick={() => { setSelectedPerson(null); setInviteOpen(false); setInviteError(""); }}>
           <section className="discover-modal" role="dialog" aria-modal="true" aria-labelledby="discover-modal-title" onClick={(event) => event.stopPropagation()}>
-            <button className="discover-modal-close" type="button" onClick={() => setSelectedPerson(null)} aria-label="Cerrar">×</button>
+            <button className="discover-modal-close" type="button" onClick={() => { setSelectedPerson(null); setInviteOpen(false); setInviteError(""); }} aria-label="Cerrar">×</button>
             <img className="discover-modal-photo" src={selectedPerson.profile?.photoUrl || genericUser} alt={`Foto de ${selectedPerson.profile?.displayName || selectedPerson.username}`} />
             <p className="discover-eyebrow">Perfil de Linkea</p>
             <h2 id="discover-modal-title">{selectedPerson.profile?.displayName || selectedPerson.username}</h2>
