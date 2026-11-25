@@ -4,6 +4,8 @@ import Hero from "../components/Hero";
 import DiscoverPeople from "../components/DiscoverPeople";
 import InstitutionFavorites from "../components/InstitutionFavorites";
 import ProfessionalHub from "../components/ProfessionalHub";
+import OpportunityHub from "../components/OpportunityHub";
+import NotificationCenter from "../components/NotificationCenter";
 import LikesHistory from "../components/LikesHistory";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
@@ -39,6 +41,8 @@ const HomePage = () => {
         <DiscoverPeople />
         <InstitutionFavorites />
         <ProfessionalHub />
+        <OpportunityHub />
+        <NotificationCenter />
       </main>
     );
   }
@@ -56,6 +60,8 @@ const HomePage = () => {
       <DiscoverPeople />
       {!isGuest && <LikesHistory />}
       {!isGuest && <ProfessionalHub />}
+      {!isGuest && <OpportunityHub />}
+      {!isGuest && <NotificationCenter />}
     </main>
   );
 };
