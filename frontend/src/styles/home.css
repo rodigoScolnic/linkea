@@ -945,3 +945,43 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 600px) {
   .discover-load-more { width: 100%; }
 }
+
+
+/* Favoritos institucionales */
+.institution-favorite-button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 9px;
+  padding: 10px 14px;
+  border: 1px solid #d8e2fa;
+  border-radius: 11px;
+  background: #f5f7ff;
+  color: #5279c8;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.institution-favorite-button:hover:not(:disabled) { background: #eaf0ff; border-color: #9db6ed; }
+.institution-favorite-button.is-saved { border-color: #e8d8a8; background: #fffaf0; color: #9a7628; }
+.institution-favorite-button:disabled { opacity: .65; cursor: wait; }
+.discover-modal-favorite-button { margin-top: 20px; }
+.institution-favorites-section { width: min(1120px, calc(100% - 48px)); margin: 0 auto 76px; color: var(--linkea-ink); }
+.institution-favorites-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.institution-favorites-heading h2 { margin: 0; font-size: clamp(24px, 4vw, 32px); font-weight: 800; letter-spacing: -.8px; }
+.institution-favorites-heading p:not(.discover-eyebrow) { margin: 7px 0 0; color: var(--linkea-muted); font-size: 13px; }
+.institution-favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: 20px; }
+.institution-favorite-card { display: flex; gap: 14px; min-width: 0; padding: 14px; border: 1px solid var(--linkea-line); border-radius: 17px; background: #fff; box-shadow: 0 8px 24px rgba(36,52,84,.045); }
+.institution-favorite-card > img { flex: 0 0 88px; width: 88px; height: 104px; border-radius: 12px; object-fit: cover; background: #edf1f8; }
+.institution-favorite-card-content { min-width: 0; flex: 1; }
+.institution-favorite-card-content h3 { margin: 2px 0 0; font-size: 15px; font-weight: 800; }
+.institution-favorite-card-content .discover-username { margin: 3px 0 0; }
+.institution-favorite-card-content .discover-vocal-register { margin: 6px 0 0; font-size: 10px; }
+.institution-favorite-card-content .discover-city { margin-top: 5px; }
+.institution-favorite-card-content button { margin-top: 10px; padding: 7px 9px; border: 1px solid #e8d8a8; border-radius: 8px; background: #fffaf0; color: #98752c; font-size: 11px; font-weight: 700; cursor: pointer; }
+.institution-favorite-card-content button:disabled { opacity: .6; cursor: wait; }
+@media (max-width: 600px) {
+  .institution-favorites-section { width: calc(100% - 32px); }
+  .institution-favorites-grid { grid-template-columns: 1fr; gap: 11px; }
+  .institution-favorites-heading { align-items: start; }
+}
