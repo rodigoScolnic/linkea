@@ -36,10 +36,11 @@ function getOtherParticipant(conversation, userId) {
 }
 
 export function initializeSocket(server) {
-  const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  const allowedOrigins = [...new Set([
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    ...(process.env.FRONTEND_URL || "").split(",").map((origin) => origin.trim()).filter(Boolean)
+  ])];
 
   const io = new Server(server, {
     cors: {
