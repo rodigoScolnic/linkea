@@ -113,3 +113,24 @@ export const conversationsApi = {
       body: { content },
     }),
 };
+
+export const opportunitiesApi = {
+  list: (token, filters = {}) => {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== "" && value != null) params.set(key, String(value));
+    });
+    return apiRequest(`/api/opportunities?${params.toString()}`, { token });
+  },
+  create: (token, opportunity) => apiRequest("/api/opportunities", { method: "POST", token, body: opportunity }),
+  apply: (token, opportunityId, message) => apiRequest(`/api/opportunities/${encodeURIComponent(opportunityId)}/applications`, { method: "POST", token, body: { message } }),
+  applications: (token, opportunityId) => apiRequest(`/api/opportunities/${encodeURIComponent(opportunityId)}/applications`, { token }),
+  updateApplication: (token, opportunityId, applicationId, status) => apiRequest(`/api/opportunities/${encodeURIComponent(opportunityId)}/applications/${encodeURIComponent(applicationId)}`, { method: "PATCH", token, body: { status } }),
+  updateStatus: (token, opportunityId, status) => apiRequest(`/api/opportunities/${encodeURIComponent(opportunityId)}/status`, { method: "PATCH", token, body: { status } }),
+};
+
+export const notificationsApi = {
+  list: (token) => apiRequest("/api/notifications", { token }),
+  markRead: (token, notificationId) => apiRequest(`/api/notifications/${encodeURIComponent(notificationId)}/read`, { method: "PATCH", token }),
+  markAllRead: (token) => apiRequest("/api/notifications/read-all", { method: "PATCH", token }),
+};
