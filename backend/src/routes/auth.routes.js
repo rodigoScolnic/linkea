@@ -12,7 +12,7 @@ const institutionTypes = ["Teatro", "Compañía", "Conservatorio", "Coro", "Agen
 const registerSchema = z.object({
   accountType: z.enum(["TALENT", "INSTITUTION"]).default("TALENT"),
   email: z.string().email().max(254),
-  username: z.string().min(3).max(30).regex(/^[a-zA-Z0-9_.-]+$/),
+  username: z.string().trim().min(3).max(30).regex(/^[a-zA-Z0-9_.-]+$/),
   password: z.string().min(8).max(72),
   displayName: z.string().min(2).max(60).optional(),
   vocalRegister: z.enum(vocalRegisters).optional(),
@@ -45,7 +45,7 @@ router.post("/register", async (req, res, next) => {
     const user = await prisma.user.create({
       data: {
         email: data.email.toLowerCase(),
-        username: data.username.toLowerCase(),
+        username: data.username.trim().toLowerCase(),
         passwordHash,
         accountType: data.accountType,
         ...(data.accountType === "TALENT"
