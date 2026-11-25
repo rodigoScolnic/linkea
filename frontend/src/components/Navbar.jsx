@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { NavLink } from "react-router";
 import { notificationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
@@ -34,12 +35,23 @@ function Navbar() {
     };
   }, [loadUnreadNotifications]);
 
+  const links = [
+    { to: "/home/perfil", label: "Mi perfil" },
+    { to: "/home/descubrir", label: isInstitution ? "Descubrir talentos" : "Descubrir" },
+    ...(!isGuest ? [{ to: isInstitution ? "/home/favoritos" : "/home/likes", label: isInstitution ? "Talentos guardados" : "Mis likes" }] : []),
+    ...(!isGuest ? [
+      { to: "/home/contactos", label: "Contactos profesionales" },
+      { to: "/home/oportunidades", label: isInstitution ? "Mis convocatorias" : "Oportunidades" },
+      { to: "/home/notificaciones", label: "Notificaciones", notifications: true }
+    ] : [])
+  ];
+
   return (
     <nav className="navbar">
-      <a href="/home" className="logo" onClick={closeMenu} aria-label="Linkea, inicio">
+      <NavLink to="/home/perfil" className="logo" onClick={closeMenu} aria-label="Linkea, inicio">
         <span className="logo-mark">L</span>
         <span>linkea</span>
-      </a>
+      </NavLink>
       <button
         className={`hamburger ${menuOpen ? "active" : ""}`}
         onClick={() => setMenuOpen((open) => !open)}
@@ -51,21 +63,23 @@ function Navbar() {
         <span></span><span></span><span></span>
       </button>
       <ul id="home-navigation" className={`nav-links ${menuOpen ? "open" : ""}`}>
-        <li><a href="#mi-perfil" onClick={closeMenu}>Mi perfil</a></li>
-        <li><a href="#descubrir" onClick={closeMenu}>Descubrir</a></li>
-        <li>
-          <a href={isInstitution ? "#favoritos" : "#mis-likes"} onClick={closeMenu}>
-            {isInstitution ? "Talentos guardados" : "Mis likes"}
-          </a>
-        </li>
-        {!isGuest && <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>}
-        {!isGuest && <li><a href="#oportunidades" onClick={closeMenu}>Oportunidades</a></li>}
-        {!isGuest && <li>
-          <a href="#notificaciones" onClick={closeMenu} className="nav-notifications-link">
-            Notificaciones
-            {hasUnreadNotifications && <span className="nav-notification-indicator" aria-label="Tenés notificaciones sin leer" />}
-          </a>
-        </li>}
+        {links.map((link) => (
+          <li key={link.to}>
+            <NavLink
+              to={link.to}
+              onClick={closeMenu}
+              className={({ isActive }) => [
+                isActive ? "active" : "",
+                link.notifications ? "nav-notifications-link" : ""
+              ].filter(Boolean).join(" ")}
+            >
+              {link.label}
+              {link.notifications && hasUnreadNotifications && (
+                <span className="nav-notification-indicator" aria-label="Tenés notificaciones sin leer" />
+              )}
+            </NavLink>
+          </li>
+        ))}
       </ul>
     </nav>
   );
