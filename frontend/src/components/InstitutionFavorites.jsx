@@ -27,7 +27,12 @@ function InstitutionFavorites() {
       }
     }
     loadFavorites();
-    return () => { active = false; };
+    const handleFavoritesChanged = () => loadFavorites();
+    window.addEventListener("linkea:favorites-changed", handleFavoritesChanged);
+    return () => {
+      active = false;
+      window.removeEventListener("linkea:favorites-changed", handleFavoritesChanged);
+    };
   }, [token, user?.accountType]);
 
   async function removeFavorite(talentId) {
