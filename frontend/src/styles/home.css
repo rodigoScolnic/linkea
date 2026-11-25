@@ -1138,3 +1138,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .opportunity-filters { grid-template-columns:1fr; }
   .opportunities-grid { grid-template-columns:1fr; }
 }
+
+.nav-notifications-link { display:inline-flex; align-items:center; gap:8px; }
+.nav-notification-indicator { display:inline-block; flex:0 0 8px; width:8px; height:8px; border-radius:50%; background:#e53945; box-shadow:0 0 0 3px rgba(229,57,69,.12); }
