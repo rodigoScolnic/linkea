@@ -27,7 +27,7 @@ function ProfessionalHub() {
         conversationsApi.list(token)
       ]);
       setInvitations(invitationData.invitations || []);
-      setConversations(conversationData.conversations || []);
+      setConversations((conversationData.conversations || []).filter((conversation) => conversation.invitation));
     } catch (err) {
       setError(err.message || "No pudimos cargar tus contactos profesionales.");
     } finally {
