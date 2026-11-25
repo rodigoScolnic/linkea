@@ -8,6 +8,12 @@ enum AccountType {
   TALENT
   INSTITUTION
 }
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
 model User {
   id String @id @default(uuid())
   email String @unique
@@ -25,6 +31,8 @@ model User {
   messages Message[]
   institutionFavorites InstitutionFavorite[] @relation("InstitutionFavorites")
   savedByInstitutions InstitutionFavorite[] @relation("FavoriteTalent")
+  sentInvitations ProfessionalInvitation[] @relation("InstitutionInvitations")
+  receivedInvitations ProfessionalInvitation[] @relation("TalentInvitations")
 }
 model Profile {
   id String @id @default(uuid())
@@ -93,9 +101,11 @@ model Match {
 }
 model Conversation {
   id String @id @default(uuid())
-  matchId String @unique
+  matchId String? @unique
+  invitationId String? @unique
   createdAt DateTime @default(now())
-  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  match Match? @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  invitation ProfessionalInvitation? @relation(fields: [invitationId], references: [id], onDelete: Cascade)
   messages Message[]
 }
 model Message {
@@ -119,4 +129,20 @@ model InstitutionFavorite {
 
   @@unique([institutionId, talentId])
   @@index([talentId])
+}
+
+model ProfessionalInvitation {
+  id String @id @default(uuid())
+  institutionId String
+  talentId String
+  title String @db.VarChar(120)
+  message String @db.VarChar(2000)
+  status InvitationStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  institution User @relation("InstitutionInvitations", fields: [institutionId], references: [id], onDelete: Cascade)
+  talent User @relation("TalentInvitations", fields: [talentId], references: [id], onDelete: Cascade)
+  conversation Conversation?
+  @@index([institutionId, createdAt])
+  @@index([talentId, status, createdAt])
 }
