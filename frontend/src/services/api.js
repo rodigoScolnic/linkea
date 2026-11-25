@@ -96,7 +96,13 @@ export const matchesApi = {
   list: (token) => apiRequest("/api/matches", { token }),
 };
 
-export const invitationsApi = {\n  list: (token) => apiRequest("/api/invitations", { token }),\n  create: (token, invitation) => apiRequest("/api/invitations", { method: "POST", token, body: invitation }),\n  respond: (token, invitationId, status) => apiRequest(`/api/invitations/${encodeURIComponent(invitationId)}`, { method: "PATCH", token, body: { status } }),\n};\n\nexport const conversationsApi = {
+export const invitationsApi = {
+  list: (token) => apiRequest("/api/invitations", { token }),
+  create: (token, invitation) => apiRequest("/api/invitations", { method: "POST", token, body: invitation }),
+  respond: (token, invitationId, status) => apiRequest(`/api/invitations/${encodeURIComponent(invitationId)}`, { method: "PATCH", token, body: { status } }),
+};
+
+export const conversationsApi = {
   list: (token) => apiRequest("/api/conversations", { token }),
   messages: (token, conversationId) =>
     apiRequest(`/api/conversations/${encodeURIComponent(conversationId)}/messages`, { token }),
