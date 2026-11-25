@@ -80,7 +80,7 @@ export function initializeSocket(server) {
 
     socket.on("conversation:leave", (payload) => {
       const parsed = z.object({ conversationId: z.string().uuid() }).safeParse(payload);
-      if (parsed.success) socket.leave(`conversation:${parsed.data.conversationId}`);
+      if (parsed.success) socket.leave(`conversation:${parsed.conversationId}`);
     });
 
     socket.on("message:send", async (payload, acknowledge = () => {}) => {
@@ -103,7 +103,7 @@ export function initializeSocket(server) {
             data: {
               conversationId: parsed.data.conversationId,
               senderId: userId,
-              content: parsed.data.content
+              content: parsed.content
             },
             include: { sender: { select: { id: true, username: true } } }
           });
