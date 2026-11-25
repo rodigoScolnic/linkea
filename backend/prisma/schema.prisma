@@ -23,6 +23,8 @@ model User {
   matchesA Match[] @relation("MatchUserA")
   matchesB Match[] @relation("MatchUserB")
   messages Message[]
+  institutionFavorites InstitutionFavorite[] @relation("InstitutionFavorites")
+  savedByInstitutions InstitutionFavorite[] @relation("FavoriteTalent")
 }
 model Profile {
   id String @id @default(uuid())
@@ -105,4 +107,16 @@ model Message {
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
   @@index([conversationId, createdAt])
+}
+
+model InstitutionFavorite {
+  id            String   @id @default(uuid())
+  institutionId String
+  talentId      String
+  createdAt     DateTime @default(now())
+  institution   User     @relation("InstitutionFavorites", fields: [institutionId], references: [id], onDelete: Cascade)
+  talent        User     @relation("FavoriteTalent", fields: [talentId], references: [id], onDelete: Cascade)
+
+  @@unique([institutionId, talentId])
+  @@index([talentId])
 }
