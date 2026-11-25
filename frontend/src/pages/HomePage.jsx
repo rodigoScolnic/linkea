@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
 import HeaderHome from "../components/HeaderHome";
 import Hero from "../components/Hero";
 import DiscoverPeople from "../components/DiscoverPeople";
@@ -10,58 +10,57 @@ import LikesHistory from "../components/LikesHistory";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
+function InstitutionProfile({ institution }) {
+  return (
+    <section className="institution-welcome institution-profile-page">
+      <span className="institution-welcome-eyebrow">LINKEA · INSTITUCIONES</span>
+      <h1>Tu espacio institucional</h1>
+      <p>Administrá tu presencia en Linkea y conectá con artistas y profesionales.</p>
+      <div className="institution-welcome-card">
+        <span>Perfil institucional</span>
+        <h2>{institution?.name || "Tu institución"}</h2>
+        <p>{institution?.type || "Institución cultural"}</p>
+      </div>
+    </section>
+  );
+}
+
 const HomePage = () => {
   const { user, isGuest, logout } = useAuth();
   const navigate = useNavigate();
+  const isInstitution = !isGuest && user?.accountType === "INSTITUTION";
 
   function handleLogout() {
     logout();
     navigate("/", { replace: true });
   }
 
-  if (!isGuest && user?.accountType === "INSTITUTION") {
-    const institution = user.institutionProfile;
-    return (
-      <main className="home-page">
-        <HeaderHome />
-        <div className="home-toolbar">
-          <span>Espacio institucional</span>
-          <button type="button" className="logout-button" onClick={handleLogout}>Cerrar sesión</button>
-        </div>
-        <section className="institution-welcome">
-          <span className="institution-welcome-eyebrow">LINK​​EA · INSTITUCIONES</span>
-          <h1>Bienvenida a Linkea</h1>
-          <p>Tu espacio para descubrir artistas, conectar con talentos y encontrar nuevas voces.</p>
-          <div className="institution-welcome-card">
-            <span>Perfil institucional</span>
-            <h2>{institution?.name || "Tu institución"}</h2>
-            <p>{institution?.type || "Institución cultural"}</p>
-          </div>
-        </section>
-        <DiscoverPeople />
-        <InstitutionFavorites />
-        <ProfessionalHub />
-        <OpportunityHub />
-        <NotificationCenter />
-      </main>
-    );
-  }
-
   return (
     <main className="home-page">
       <HeaderHome />
       <div className="home-toolbar">
-        <span>{isGuest ? "Modo visitante" : "Mi espacio"}</span>
+        <span>{isGuest ? "Modo visitante" : isInstitution ? "Espacio institucional" : "Mi espacio"}</span>
         <button type="button" className="logout-button" onClick={handleLogout}>
           {isGuest ? "Salir del modo visitante" : "Cerrar sesión"}
         </button>
       </div>
-      <Hero user={user} />
-      <DiscoverPeople />
-      {!isGuest && <LikesHistory />}
-      {!isGuest && <ProfessionalHub />}
-      {!isGuest && <OpportunityHub />}
-      {!isGuest && <NotificationCenter />}
+
+      <div className="home-tab-content">
+        <Routes>
+          <Route index element={<Navigate to="perfil" replace />} />
+          <Route path="perfil" element={isInstitution
+            ? <InstitutionProfile institution={user?.institutionProfile} />
+            : <Hero user={user} />} />
+          <Route path="descubrir" element={<DiscoverPeople />} />
+          {!isGuest && (isInstitution
+            ? <Route path="favoritos" element={<InstitutionFavorites />} />
+            : <Route path="likes" element={<LikesHistory />} />)}
+          {!isGuest && <Route path="contactos" element={<ProfessionalHub />} />}
+          {!isGuest && <Route path="oportunidades" element={<OpportunityHub />} />}
+          {!isGuest && <Route path="notificaciones" element={<NotificationCenter />} />}
+          <Route path="*" element={<Navigate to="perfil" replace />} />
+        </Routes>
+      </div>
     </main>
   );
 };
