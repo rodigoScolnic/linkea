@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { discoveryApi, likesApi } from "../services/api";
+import { discoveryApi, favoritesApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
@@ -20,6 +20,26 @@ function DiscoverPeople() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState([]);
+  const [favoriteBusyIds, setFavoriteBusyIds] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    async function loadFavorites() {
+      if (!isInstitution || !token) {
+        setFavoriteIds([]);
+        return;
+      }
+      try {
+        const response = await favoritesApi.list(token);
+        if (active) setFavoriteIds((response.favorites || []).map((item) => item.talentId));
+      } catch (err) {
+        if (active) setError(err.message || "No pudimos cargar tus favoritos.");
+      }
+    }
+    loadFavorites();
+    return () => { active = false; };
+  }, [token, isInstitution]);
 
   useEffect(() => {
     let active = true;
@@ -64,6 +84,26 @@ function DiscoverPeople() {
     setFilters(initialFilters);
     setOffset(0);
     setAppliedFilters(initialFilters);
+  }
+
+  async function toggleFavorite(person) {
+    if (!token || favoriteBusyIds.includes(person.id)) return;
+    const alreadySaved = favoriteIds.includes(person.id);
+    setFavoriteBusyIds((current) => [...current, person.id]);
+    setError("");
+    try {
+      if (alreadySaved) {
+        await favoritesApi.remove(token, person.id);
+        setFavoriteIds((current) => current.filter((id) => id !== person.id));
+      } else {
+        await favoritesApi.add(token, person.id);
+        setFavoriteIds((current) => [...current, person.id]);
+      }
+    } catch (err) {
+      setError(err.message || "No pudimos actualizar tus favoritos.");
+    } finally {
+      setFavoriteBusyIds((current) => current.filter((id) => id !== person.id));
+    }
   }
 
   async function handleLike(person) {
@@ -162,7 +202,11 @@ function DiscoverPeople() {
                   {profile.bio && <p className="discover-bio">{profile.bio}</p>}
                   {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
                   <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>Ver perfil</button>
-                  {!isInstitution && <button type="button" className="discover-like-button" onClick={() => handleLike(person)} disabled={isLiking}>{isLiking ? "Enviando..." : "♥ Me gusta"}</button>}
+                  {isInstitution ? (
+                    <button type="button" className={`institution-favorite-button ${favoriteIds.includes(person.id) ? "is-saved" : ""}`} onClick={() => toggleFavorite(person)} disabled={favoriteBusyIds.includes(person.id)}>
+                      {favoriteBusyIds.includes(person.id) ? "Guardando..." : favoriteIds.includes(person.id) ? "★ Guardado" : "☆ Guardar talento"}
+                    </button>
+                  ) : <button type="button" className="discover-like-button" onClick={() => handleLike(person)} disabled={isLiking}>{isLiking ? "Enviando..." : "♥ Me gusta"}</button>}
                 </div>
               </article>
             );
@@ -196,7 +240,11 @@ function DiscoverPeople() {
             {selectedPerson.profile?.interests?.length > 0 && <div className="discover-interests discover-modal-interests">{selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}</div>}
             {selectedPerson.profile?.media?.length > 0 && <div className="discover-public-gallery"><h3>Galería</h3><div className="profile-gallery-grid">{selectedPerson.profile.media.map((item) => <div className="profile-gallery-item" key={item.id}>{item.type === "video" ? <video src={item.url} controls preload="metadata" /> : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}</div>)}</div></div>}
             {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
-            {!isInstitution && <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>}
+            {isInstitution ? (
+              <button type="button" className={`institution-favorite-button discover-modal-favorite-button ${favoriteIds.includes(selectedPerson.id) ? "is-saved" : ""}`} onClick={() => toggleFavorite(selectedPerson)} disabled={favoriteBusyIds.includes(selectedPerson.id)}>
+                {favoriteBusyIds.includes(selectedPerson.id) ? "Guardando..." : favoriteIds.includes(selectedPerson.id) ? "★ Guardado en favoritos" : "☆ Guardar en favoritos"}
+              </button>
+            ) : <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>}
           </section>
         </div>
       )}
