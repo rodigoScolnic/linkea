@@ -1141,3 +1141,43 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 
 .nav-notifications-link { display:inline-flex; align-items:center; gap:8px; }
 .nav-notification-indicator { display:inline-block; flex:0 0 8px; width:8px; height:8px; border-radius:50%; background:#e53945; box-shadow:0 0 0 3px rgba(229,57,69,.12); }
+
+
+/* Navegación por pestañas */
+.home-tab-content {
+  min-height: 62vh;
+  padding: 18px 0 30px;
+}
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  transition: color .2s ease, border-color .2s ease;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: cornflowerblue;
+}
+.nav-links a.active {
+  border-bottom-color: cornflowerblue;
+  font-weight: 700;
+}
+.institution-profile-page {
+  margin-top: 24px;
+}
+@media (max-width: 768px) {
+  .nav-links a {
+    width: 100%;
+    padding: 9px 0;
+    border-bottom: 0;
+  }
+  .nav-links a.active {
+    color: cornflowerblue;
+    font-weight: 800;
+  }
+  .home-tab-content {
+    padding-top: 12px;
+  }
+}
