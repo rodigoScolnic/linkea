@@ -84,6 +84,14 @@ export const likesApi = {
     apiRequest(`/api/likes/${encodeURIComponent(userId)}`, { method: "DELETE", token }),
 };
 
+export const favoritesApi = {
+  list: (token) => apiRequest("/api/favorites", { token }),
+  add: (token, talentId) =>
+    apiRequest(`/api/favorites/${encodeURIComponent(talentId)}`, { method: "POST", token }),
+  remove: (token, talentId) =>
+    apiRequest(`/api/favorites/${encodeURIComponent(talentId)}`, { method: "DELETE", token }),
+};
+
 export const matchesApi = {
   list: (token) => apiRequest("/api/matches", { token }),
 };
