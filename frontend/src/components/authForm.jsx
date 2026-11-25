@@ -52,10 +52,6 @@ const AuthForm = () => {
     event.preventDefault();
     setError("");
     const normalizedUsername = username.trim();
-    if (!/^[a-zA-Z0-9_.-]+$/.test(normalizedUsername)) {
-      setError("El nombre de usuario solo puede contener letras, números, guion, guion bajo y punto.");
-      return;
-    }
     setSubmitting(true);
     const userData = {
       accountType,
