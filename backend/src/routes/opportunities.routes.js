@@ -4,8 +4,6 @@ import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
-const registers = ["Soprano", "Mezzosoprano", "Contralto", "Contratenor", "Tenor", "Barítono", "Bajo"];
-
 async function accountType(userId) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { accountType: true } });
   return user?.accountType || null;
@@ -145,7 +143,7 @@ router.patch("/:id/applications/:applicationId", requireAuth, async (req, res, n
     const { id, applicationId } = z.object({ id: z.string().uuid(), applicationId: z.string().uuid() }).parse(req.params);
     const { status } = z.object({ status: z.enum(["REVIEWING", "SELECTED", "REJECTED"]) }).parse(req.body);
     const application = await prisma.application.findFirst({
-      where: { id: applicationId, opportunityId: id, opportunity: { institutionId: req.user.id } },
+      where: { id: applicationId, opportunityId: id, opportunity: { is: { institutionId: req.user.id } } },
       include: { opportunity: { select: { title: true } } }
     });
     if (!application) return res.status(404).json({ error: "Postulación no encontrada." });
