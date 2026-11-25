@@ -51,11 +51,16 @@ const AuthForm = () => {
   async function handleRegister(event) {
     event.preventDefault();
     setError("");
+    const normalizedUsername = username.trim();
+    if (!/^[a-zA-Z0-9_.-]+$/.test(normalizedUsername)) {
+      setError("El nombre de usuario solo puede contener letras, números, guion, guion bajo y punto.");
+      return;
+    }
     setSubmitting(true);
     const userData = {
       accountType,
       email: email.trim(),
-      username: username.trim(),
+      username: normalizedUsername,
       password: registerPassword,
       ...(accountType === "TALENT"
         ? { displayName: displayName.trim(), vocalRegister }
@@ -131,7 +136,7 @@ const AuthForm = () => {
               )}
 
               <input id="register-email" name="email" type="email" placeholder="Correo electrónico" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-              <input id="register-username" name="username" type="text" placeholder="Elegí un nombre de usuario" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} minLength={3} maxLength={30} pattern="[-a-zA-Z0-9_.]+" required />
+              <input id="register-username" name="username" type="text" placeholder="Elegí un nombre de usuario" autoComplete="username" value={username} onChange={(event) => setUsername(event.target.value)} minLength={3} maxLength={30} required />
               <input id="register-password" name="new-password" type="password" placeholder="Contraseña (mínimo 8 caracteres)" autoComplete="new-password" value={registerPassword} onChange={(event) => setRegisterPassword(event.target.value)} minLength={8} required />
               {error && <p className="register-modal-error" role="alert">{error}</p>}
               <button type="submit" disabled={submitting}>{submitting ? "Creando cuenta..." : "Crear cuenta"}</button>
