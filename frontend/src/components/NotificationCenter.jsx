@@ -35,6 +35,7 @@ function NotificationCenter() {
       await notificationsApi.markRead(token, notification.id);
       setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, readAt: new Date().toISOString() } : item));
       setUnreadCount((count) => Math.max(0, count - 1));
+      window.dispatchEvent(new Event("linkea:notifications-changed"));
     } catch (err) { setError(err.message || "No pudimos actualizar la notificación."); }
   }
 
@@ -44,6 +45,7 @@ function NotificationCenter() {
       const now = new Date().toISOString();
       setNotifications((current) => current.map((item) => ({ ...item, readAt: item.readAt || now })));
       setUnreadCount(0);
+      window.dispatchEvent(new Event("linkea:notifications-changed"));
     } catch (err) { setError(err.message || "No pudimos actualizar las notificaciones."); }
   }
 
