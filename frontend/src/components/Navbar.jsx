@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
 
   return (
@@ -24,7 +27,11 @@ function Navbar() {
       <ul id="home-navigation" className={`nav-links ${menuOpen ? "open" : ""}`}>
         <li><a href="#mi-perfil" onClick={closeMenu}>Mi perfil</a></li>
         <li><a href="#descubrir" onClick={closeMenu}>Descubrir</a></li>
-        <li><a href="#mis-likes" onClick={closeMenu}>Mis likes</a></li>
+        <li>
+          <a href={isInstitution ? "#favoritos" : "#mis-likes"} onClick={closeMenu}>
+            {isInstitution ? "Talentos guardados" : "Mis likes"}
+          </a>
+        </li>
       </ul>
     </nav>
   );
