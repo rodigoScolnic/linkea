@@ -114,9 +114,9 @@ export function initializeSocket(server) {
               actorId: userId,
               type: "CHAT_MESSAGE",
               title: "Nuevo mensaje",
-              message: parsed.data.content.length > 120
-                ? `${parsed.data.content.slice(0, 117)}...`
-                : parsed.data.content,
+              message: parsed.content.length > 120
+                ? `${parsed.content.slice(0, 117)}...`
+                : parsed.content,
               link: "/home/mensajes"
             }
           });
