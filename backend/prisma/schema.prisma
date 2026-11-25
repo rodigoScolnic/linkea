@@ -14,6 +14,26 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
 }
+
+enum OpportunityStatus {
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  REVIEWING
+  SELECTED
+  REJECTED
+}
+
+enum NotificationType {
+  NEW_OPPORTUNITY
+  NEW_APPLICATION
+  APPLICATION_UPDATE
+  PROFESSIONAL_INVITATION
+  INVITATION_RESPONSE
+}
 model User {
   id String @id @default(uuid())
   email String @unique
@@ -33,6 +53,10 @@ model User {
   savedByInstitutions InstitutionFavorite[] @relation("FavoriteTalent")
   sentInvitations ProfessionalInvitation[] @relation("InstitutionInvitations")
   receivedInvitations ProfessionalInvitation[] @relation("TalentInvitations")
+  postedOpportunities Opportunity[]
+  applications Application[] @relation("TalentApplications")
+  notificationsReceived Notification[] @relation("NotificationRecipient")
+  notificationsSent Notification[] @relation("NotificationActor")
 }
 model Profile {
   id String @id @default(uuid())
@@ -145,4 +169,54 @@ model ProfessionalInvitation {
   conversation Conversation?
   @@index([institutionId, createdAt])
   @@index([talentId, status, createdAt])
+}
+
+model Opportunity {
+  id String @id @default(uuid())
+  institutionId String
+  title String @db.VarChar(140)
+  description String @db.VarChar(3000)
+  type String @db.VarChar(40)
+  vocalRegisters String[] @default([])
+  requirements String? @db.VarChar(2000)
+  city String?
+  country String?
+  deadline DateTime?
+  status OpportunityStatus @default(OPEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  institution User @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  applications Application[]
+  @@index([status, deadline, createdAt])
+  @@index([institutionId, createdAt])
+}
+
+model Application {
+  id String @id @default(uuid())
+  opportunityId String
+  talentId String
+  message String? @db.VarChar(2000)
+  status ApplicationStatus @default(SUBMITTED)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  opportunity Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  talent User @relation("TalentApplications", fields: [talentId], references: [id], onDelete: Cascade)
+  @@unique([opportunityId, talentId])
+  @@index([talentId, createdAt])
+  @@index([opportunityId, status, createdAt])
+}
+
+model Notification {
+  id String @id @default(uuid())
+  recipientId String
+  actorId String?
+  type NotificationType
+  title String @db.VarChar(160)
+  message String @db.VarChar(500)
+  link String?
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  recipient User @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  @@index([recipientId, readAt, createdAt])
 }
