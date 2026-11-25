@@ -6,7 +6,8 @@ import genericUser from "../assets/images/genericUser.png";
 const initialFilters = { vocalRegister: "", minAge: "", maxAge: "", city: "" };
 
 function DiscoverPeople() {
-  const { token, isGuest } = useAuth();
+  const { token, isGuest, user } = useAuth();
+  const isInstitution = user?.accountType === "INSTITUTION";
   const [people, setPeople] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,25 +17,36 @@ function DiscoverPeople() {
   const [likingIds, setLikingIds] = useState([]);
   const [filters, setFilters] = useState(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState(initialFilters);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     let active = true;
     async function loadPeople() {
       if (!token || isGuest) { setLoading(false); return; }
       try {
-        setLoading(true);
+        if (offset === 0) setLoading(true);
+        else setLoadingMore(true);
         setError("");
-        const response = await discoveryApi.list(token, 20, appliedFilters);
-        if (active) setPeople(response.users || []);
+        const response = await discoveryApi.list(token, 50, appliedFilters, offset);
+        if (!active) return;
+        setPeople((current) => offset === 0
+          ? (response.users || [])
+          : [...current, ...(response.users || [])]);
+        setHasMore(Boolean(response.hasMore));
       } catch (err) {
         if (active) setError(err.message || "No pudimos cargar los perfiles.");
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       }
     }
     loadPeople();
     return () => { active = false; };
-  }, [token, isGuest, appliedFilters]);
+  }, [token, isGuest, appliedFilters, offset]);
 
   function updateFilter(event) {
     const { name, value } = event.target;
@@ -44,11 +56,13 @@ function DiscoverPeople() {
   function applyFilters(event) {
     event.preventDefault();
     setError("");
+    setOffset(0);
     setAppliedFilters({ ...filters });
   }
 
   function clearFilters() {
     setFilters(initialFilters);
+    setOffset(0);
     setAppliedFilters(initialFilters);
   }
 
@@ -75,9 +89,11 @@ function DiscoverPeople() {
     <section className="discover-section" id="descubrir">
       <div className="discover-heading">
         <div>
-          <p className="discover-eyebrow">Conocé gente nueva</p>
-          <h2>Descubrí perfiles</h2>
-          <p className="discover-subtitle">Personas que ya forman parte de Linkea.</p>
+          <p className="discover-eyebrow">{isInstitution ? "Búsqueda de talentos" : "Conocé gente nueva"}</p>
+          <h2>{isInstitution ? "Descubrí artistas" : "Descubrí perfiles"}</h2>
+          <p className="discover-subtitle">{isInstitution
+            ? "Explorá los perfiles de cantantes y artistas que forman parte de Linkea."
+            : "Personas que ya forman parte de Linkea."}</p>
         </div>
         {!loading && !error && <span className="discover-count">{people.length} {people.length === 1 ? "perfil" : "perfiles"}</span>}
       </div>
@@ -85,8 +101,8 @@ function DiscoverPeople() {
       {!isGuest && (
         <form className="discover-filters" onSubmit={applyFilters}>
           <div className="discover-filters-heading">
-            <h3>Filtrar perfiles</h3>
-            <span>Encontrá personas según tus preferencias</span>
+            <h3>Filtrar talentos</h3>
+            <span>Combiná criterios para encontrar el perfil que buscás</span>
           </div>
           <div className="discover-filter-fields">
             <label>
@@ -146,11 +162,19 @@ function DiscoverPeople() {
                   {profile.bio && <p className="discover-bio">{profile.bio}</p>}
                   {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
                   <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>Ver perfil</button>
-                  <button type="button" className="discover-like-button" onClick={() => handleLike(person)} disabled={isLiking}>{isLiking ? "Enviando..." : "♥ Me gusta"}</button>
+                  {!isInstitution && <button type="button" className="discover-like-button" onClick={() => handleLike(person)} disabled={isLiking}>{isLiking ? "Enviando..." : "♥ Me gusta"}</button>}
                 </div>
               </article>
             );
           })}
+        </div>
+      )}
+
+      {!loading && !error && hasMore && (
+        <div className="discover-load-more-wrap">
+          <button type="button" className="discover-load-more" onClick={() => setOffset((current) => current + 50)} disabled={loadingMore}>
+            {loadingMore ? "Cargando perfiles..." : "Cargar más perfiles"}
+          </button>
         </div>
       )}
 
@@ -172,7 +196,7 @@ function DiscoverPeople() {
             {selectedPerson.profile?.interests?.length > 0 && <div className="discover-interests discover-modal-interests">{selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}</div>}
             {selectedPerson.profile?.media?.length > 0 && <div className="discover-public-gallery"><h3>Galería</h3><div className="profile-gallery-grid">{selectedPerson.profile.media.map((item) => <div className="profile-gallery-item" key={item.id}>{item.type === "video" ? <video src={item.url} controls preload="metadata" /> : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}</div>)}</div></div>}
             {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
-            <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>
+            {!isInstitution && <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>}
           </section>
         </div>
       )}
