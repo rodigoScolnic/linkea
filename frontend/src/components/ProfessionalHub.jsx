@@ -37,6 +37,20 @@ function ProfessionalHub() {
 
   useEffect(() => { loadHub(); }, [loadHub]);
 
+  useEffect(() => {
+    if (!selectedConversation || !token) return undefined;
+    const intervalId = window.setInterval(async () => {
+      try {
+        const response = await conversationsApi.messages(token, selectedConversation.id);
+        setMessages(response.messages || []);
+      } catch {
+        // Se conserva el contenido visible; el usuario puede reintentar con el botón de actualizar.
+      }
+    }, 5000);
+    return () => window.clearInterval(intervalId);
+  }, [selectedConversation?.id, token]);
+
+
   async function openConversation(conversation) {
     setSelectedConversation(conversation);
     setMessagesLoading(true);
