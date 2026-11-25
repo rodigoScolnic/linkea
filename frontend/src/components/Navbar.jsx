@@ -4,7 +4,7 @@ import "../styles/home.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
 
@@ -32,7 +32,7 @@ function Navbar() {
             {isInstitution ? "Talentos guardados" : "Mis likes"}
           </a>
         </li>
-        <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>
+        {!isGuest && <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>}
       </ul>
     </nav>
   );
