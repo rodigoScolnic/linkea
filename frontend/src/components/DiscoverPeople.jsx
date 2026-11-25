@@ -21,7 +21,12 @@ function DiscoverPeople() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState([]);
-  const [favoriteBusyIds, setFavoriteBusyIds] = useState([]);\n  const [inviteOpen, setInviteOpen] = useState(false);\n  const [inviteTitle, setInviteTitle] = useState("");\n  const [inviteMessage, setInviteMessage] = useState("");\n  const [inviteError, setInviteError] = useState("");\n  const [sendingInvite, setSendingInvite] = useState(false);
+  const [favoriteBusyIds, setFavoriteBusyIds] = useState([]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteTitle, setInviteTitle] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteError, setInviteError] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
 
   useEffect(() => {
     let active = true;
