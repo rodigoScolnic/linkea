@@ -914,3 +914,34 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .institution-welcome-card h2 { margin: 10px 0 4px; font-size: 25px; }
 .institution-welcome-card p { color: var(--linkea-muted); }
 .institution-welcome-card small { display: block; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--linkea-line); color: var(--linkea-muted); }
+
+
+/* Directorio institucional de talentos */
+.discover-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 28px 0 8px;
+}
+.discover-load-more {
+  min-height: 43px;
+  padding: 10px 20px;
+  border: 1px solid var(--linkea-blue-dark);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--linkea-blue-dark);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .2s ease;
+}
+.discover-load-more:hover:not(:disabled) {
+  background: var(--linkea-blue-dark);
+  color: #fff;
+}
+.discover-load-more:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+@media (max-width: 600px) {
+  .discover-load-more { width: 100%; }
+}
