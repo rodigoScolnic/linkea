@@ -131,9 +131,12 @@ function MessagesPage() {
     setError("");
     try {
       const data = await conversationsApi.messages(token, conversationId, { limit: 50 });
-      setMessages(data.messages || []);
+      const readResult = await conversationsApi.markRead(token, conversationId);
+      const readAt = readResult.readAt || new Date().toISOString();
+      setMessages((data.messages || []).map((message) =>
+        message.senderId !== user?.id && !message.readAt ? { ...message, readAt } : message
+      ));
       setHasMore(Boolean(data.hasMore));
-      await conversationsApi.markRead(token, conversationId);
       setConversations((current) => current.map((item) =>
         item.id === conversationId ? { ...item, unreadCount: 0 } : item
       ));
@@ -142,7 +145,7 @@ function MessagesPage() {
     } finally {
       setMessagesLoading(false);
     }
-  }, [token]);
+  }, [token, user?.id]);
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
