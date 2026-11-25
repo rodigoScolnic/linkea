@@ -8,6 +8,13 @@ const vocalRegisters = ["Tenor", "Barítono", "Bajo", "Soprano", "Mezzo", "Contr
 router.get("/", requireAuth, async (req, res, next) => {
   try {
     const take = Math.min(Math.max(Number(req.query.limit) || 20, 1), 50);
+    const skip = Math.max(Number.parseInt(req.query.offset, 10) || 0, 0);
+    const currentUser = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { accountType: true }
+    });
+    if (!currentUser) return res.status(404).json({ error: "Usuario no encontrado." });
+    const isInstitution = currentUser.accountType === "INSTITUTION";
     const { vocalRegister, city } = req.query;
     const minAge = req.query.minAge === "" || req.query.minAge == null ? null : Number(req.query.minAge);
     const maxAge = req.query.maxAge === "" || req.query.maxAge == null ? null : Number(req.query.maxAge);
@@ -35,10 +42,13 @@ router.get("/", requireAuth, async (req, res, next) => {
     if (city?.trim()) profileWhere.city = { contains: city.trim(), mode: "insensitive" };
     if (Object.keys(birthDate).length) profileWhere.birthDate = birthDate;
 
-    const users = await prisma.user.findMany({
+    const foundUsers = await prisma.user.findMany({
       where: {
         id: { not: req.user.id },
-        likesReceived: { none: { fromUserId: req.user.id } },
+        accountType: "TALENT",
+        ...(isInstitution ? {} : {
+          likesReceived: { none: { fromUserId: req.user.id } }
+        }),
         profile: { is: profileWhere }
       },
       select: {
@@ -46,10 +56,13 @@ router.get("/", requireAuth, async (req, res, next) => {
         username: true,
         profile: { select: { displayName: true, bio: true, city: true, birthDate: true, vocalRegister: true, interests: true, photoUrl: true, gender: true, languages: true, experience: true, repertoire: true, media: { orderBy: { createdAt: "desc" } } } }
       },
-      take,
+      take: take + 1,
+      skip,
       orderBy: { createdAt: "desc" }
     });
-    res.json({ users });
+    const hasMore = foundUsers.length > take;
+    const users = hasMore ? foundUsers.slice(0, take) : foundUsers;
+    res.json({ users, hasMore });
   } catch (error) { next(error); }
 });
 
