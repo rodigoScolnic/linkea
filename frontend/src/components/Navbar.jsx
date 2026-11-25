@@ -1,12 +1,38 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { notificationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, isGuest } = useAuth();
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const { user, isGuest, token } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
+
+  const loadUnreadNotifications = useCallback(async () => {
+    if (!token || isGuest) {
+      setHasUnreadNotifications(false);
+      return;
+    }
+    try {
+      const data = await notificationsApi.list(token);
+      setHasUnreadNotifications((data.unreadCount || 0) > 0);
+    } catch {
+      // Keep navigation usable if notifications are temporarily unavailable.
+    }
+  }, [token, isGuest]);
+
+  useEffect(() => {
+    loadUnreadNotifications();
+    const interval = window.setInterval(loadUnreadNotifications, 30000);
+    const handleNotificationsChanged = () => loadUnreadNotifications();
+    window.addEventListener("linkea:notifications-changed", handleNotificationsChanged);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("linkea:notifications-changed", handleNotificationsChanged);
+    };
+  }, [loadUnreadNotifications]);
 
   return (
     <nav className="navbar">
@@ -34,7 +60,12 @@ function Navbar() {
         </li>
         {!isGuest && <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>}
         {!isGuest && <li><a href="#oportunidades" onClick={closeMenu}>Oportunidades</a></li>}
-        {!isGuest && <li><a href="#notificaciones" onClick={closeMenu}>Notificaciones</a></li>}
+        {!isGuest && <li>
+          <a href="#notificaciones" onClick={closeMenu} className="nav-notifications-link">
+            Notificaciones
+            {hasUnreadNotifications && <span className="nav-notification-indicator" aria-label="Tenés notificaciones sin leer" />}
+          </a>
+        </li>}
       </ul>
     </nav>
   );
