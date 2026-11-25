@@ -50,12 +50,25 @@ router.post("/", requireAuth, async (req, res, next) => {
       select: { id: true }
     });
     if (pending) return res.status(409).json({ error: "Ya tenés una invitación pendiente para este talento." });
-    const invitation = await prisma.professionalInvitation.create({
-      data: { institutionId: req.user.id, talentId: talent.id, title: data.title, message: data.message },
-      include: {
-        institution: { select: { id: true, username: true, institutionProfile: true } },
-        talent: { select: { id: true, username: true, profile: true } }
-      }
+    const invitation = await prisma.$transaction(async (tx) => {
+      const created = await tx.professionalInvitation.create({
+        data: { institutionId: req.user.id, talentId: talent.id, title: data.title, message: data.message },
+        include: {
+          institution: { select: { id: true, username: true, institutionProfile: true } },
+          talent: { select: { id: true, username: true, profile: true } }
+        }
+      });
+      await tx.notification.create({
+        data: {
+          recipientId: talent.id,
+          actorId: req.user.id,
+          type: "PROFESSIONAL_INVITATION",
+          title: "Nueva invitación profesional",
+          message: data.title,
+          link: "#contactos"
+        }
+      });
+      return created;
     });
     res.status(201).json({ invitation });
   } catch (error) { next(error); }
@@ -89,6 +102,16 @@ router.patch("/:id", requireAuth, async (req, res, next) => {
       const conversation = status === "ACCEPTED"
         ? await tx.conversation.create({ data: { invitationId: id } })
         : null;
+      await tx.notification.create({
+        data: {
+          recipientId: updated.institutionId,
+          actorId: req.user.id,
+          type: "INVITATION_RESPONSE",
+          title: status === "ACCEPTED" ? "Invitación aceptada" : "Invitación rechazada",
+          message: `Tu invitación «${updated.title}» fue ${status === "ACCEPTED" ? "aceptada" : "rechazada"}.`,
+          link: "#contactos"
+        }
+      });
       return { invitation: updated, conversation };
     });
     res.json(result);
