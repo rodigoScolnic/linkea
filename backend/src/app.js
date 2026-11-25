@@ -15,7 +15,12 @@ import notificationsRoutes from "./routes/notifications.routes.js";
 import { errorHandler, notFound } from "./middleware/errors.js";
 const app = express();
 app.use(helmet());
-app.use(cors({ origin: process.env.FRONTEND_URL?.split(",") || "http://localhost:5173" }));
+const allowedOrigins = [...new Set([
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  ...(process.env.FRONTEND_URL || "").split(",").map((origin) => origin.trim()).filter(Boolean)
+])];
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 app.use("/api/auth", rateLimit({ windowMs: 15 * 60 * 1000, limit: 30 }));
 app.get("/api/health", (req, res) => res.json({ status: "ok", service: "Linkea API" }));

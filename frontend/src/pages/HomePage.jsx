@@ -4,6 +4,7 @@ import Hero from "../components/Hero";
 import DiscoverPeople from "../components/DiscoverPeople";
 import InstitutionFavorites from "../components/InstitutionFavorites";
 import ProfessionalHub from "../components/ProfessionalHub";
+import MessagesPage from "./MessagesPage";
 import OpportunityHub from "../components/OpportunityHub";
 import NotificationCenter from "../components/NotificationCenter";
 import LikesHistory from "../components/LikesHistory";
@@ -56,6 +57,7 @@ const HomePage = () => {
             ? <Route path="favoritos" element={<InstitutionFavorites />} />
             : <Route path="likes" element={<LikesHistory />} />)}
           {!isGuest && <Route path="contactos" element={<ProfessionalHub />} />}
+          {!isGuest && <Route path="mensajes" element={<MessagesPage />} />}
           {!isGuest && <Route path="oportunidades" element={<OpportunityHub />} />}
           {!isGuest && <Route path="notificaciones" element={<NotificationCenter />} />}
           <Route path="*" element={<Navigate to="perfil" replace />} />
