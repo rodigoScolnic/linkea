@@ -32,6 +32,7 @@ function Navbar() {
             {isInstitution ? "Talentos guardados" : "Mis likes"}
           </a>
         </li>
+        <li><a href="#contactos" onClick={closeMenu}>Contactos profesionales</a></li>
       </ul>
     </nav>
   );
