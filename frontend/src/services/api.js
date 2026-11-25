@@ -67,8 +67,8 @@ export const profileApi = {
 };
 
 export const discoveryApi = {
-  list: (token, limit = 20, filters = {}) => {
-    const params = new URLSearchParams({ limit: String(limit) });
+  list: (token, limit = 20, filters = {}, offset = 0) => {
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== "" && value != null) params.set(key, String(value));
     });
