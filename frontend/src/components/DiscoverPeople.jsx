@@ -95,9 +95,11 @@ function DiscoverPeople() {
       if (alreadySaved) {
         await favoritesApi.remove(token, person.id);
         setFavoriteIds((current) => current.filter((id) => id !== person.id));
+        window.dispatchEvent(new Event("linkea:favorites-changed"));
       } else {
         await favoritesApi.add(token, person.id);
         setFavoriteIds((current) => [...current, person.id]);
+        window.dispatchEvent(new Event("linkea:favorites-changed"));
       }
     } catch (err) {
       setError(err.message || "No pudimos actualizar tus favoritos.");
