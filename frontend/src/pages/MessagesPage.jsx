@@ -113,6 +113,7 @@ function MessagesPage() {
     });
 
     socket.on("notification:new", () => {
+      loadConversations();
       window.dispatchEvent(new Event("linkea:notifications-changed"));
     });
 
