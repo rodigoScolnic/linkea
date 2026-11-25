@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { discoveryApi, favoritesApi, likesApi } from "../services/api";
+import { discoveryApi, favoritesApi, invitationsApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
@@ -21,7 +21,7 @@ function DiscoverPeople() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState([]);
-  const [favoriteBusyIds, setFavoriteBusyIds] = useState([]);
+  const [favoriteBusyIds, setFavoriteBusyIds] = useState([]);\n  const [inviteOpen, setInviteOpen] = useState(false);\n  const [inviteTitle, setInviteTitle] = useState("");\n  const [inviteMessage, setInviteMessage] = useState("");\n  const [inviteError, setInviteError] = useState("");\n  const [sendingInvite, setSendingInvite] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -105,6 +105,28 @@ function DiscoverPeople() {
       setError(err.message || "No pudimos actualizar tus favoritos.");
     } finally {
       setFavoriteBusyIds((current) => current.filter((id) => id !== person.id));
+    }
+  }
+
+  async function sendProfessionalInvitation(event) {
+    event.preventDefault();
+    if (!selectedPerson || !token || sendingInvite) return;
+    setSendingInvite(true);
+    setInviteError("");
+    try {
+      await invitationsApi.create(token, {
+        talentId: selectedPerson.id,
+        title: inviteTitle,
+        message: inviteMessage
+      });
+      setNotice(`Invitación enviada a @${selectedPerson.username}.`);
+      setInviteOpen(false);
+      setInviteTitle("");
+      setInviteMessage("");
+    } catch (err) {
+      setInviteError(err.message || "No pudimos enviar la invitación.");
+    } finally {
+      setSendingInvite(false);
     }
   }
 
@@ -243,9 +265,29 @@ function DiscoverPeople() {
             {selectedPerson.profile?.media?.length > 0 && <div className="discover-public-gallery"><h3>Galería</h3><div className="profile-gallery-grid">{selectedPerson.profile.media.map((item) => <div className="profile-gallery-item" key={item.id}>{item.type === "video" ? <video src={item.url} controls preload="metadata" /> : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}</div>)}</div></div>}
             {likeError && <p className="discover-status discover-error" role="alert">{likeError}</p>}
             {isInstitution ? (
-              <button type="button" className={`institution-favorite-button discover-modal-favorite-button ${favoriteIds.includes(selectedPerson.id) ? "is-saved" : ""}`} onClick={() => toggleFavorite(selectedPerson)} disabled={favoriteBusyIds.includes(selectedPerson.id)}>
-                {favoriteBusyIds.includes(selectedPerson.id) ? "Guardando..." : favoriteIds.includes(selectedPerson.id) ? "★ Guardado en favoritos" : "☆ Guardar en favoritos"}
-              </button>
+              <>
+                <button type="button" className={`institution-favorite-button discover-modal-favorite-button ${favoriteIds.includes(selectedPerson.id) ? "is-saved" : ""}`} onClick={() => toggleFavorite(selectedPerson)} disabled={favoriteBusyIds.includes(selectedPerson.id)}>
+                  {favoriteBusyIds.includes(selectedPerson.id) ? "Guardando..." : favoriteIds.includes(selectedPerson.id) ? "★ Guardado en favoritos" : "☆ Guardar en favoritos"}
+                </button>
+                {!inviteOpen ? (
+                  <button type="button" className="professional-invite-button" onClick={() => { setInviteError(""); setInviteOpen(true); }}>Enviar invitación profesional</button>
+                ) : (
+                  <form className="professional-invite-form" onSubmit={sendProfessionalInvitation}>
+                    <h3>Invitar a colaborar</h3>
+                    <label>Asunto
+                      <input value={inviteTitle} onChange={(event) => setInviteTitle(event.target.value)} minLength={3} maxLength={120} required placeholder="Ej. Audición para próxima temporada" />
+                    </label>
+                    <label>Mensaje
+                      <textarea value={inviteMessage} onChange={(event) => setInviteMessage(event.target.value)} minLength={10} maxLength={2000} required rows={4} placeholder="Contale al artista de qué se trata la propuesta..." />
+                    </label>
+                    {inviteError && <p className="discover-status discover-error" role="alert">{inviteError}</p>}
+                    <div className="professional-invite-actions">
+                      <button type="submit" disabled={sendingInvite}>{sendingInvite ? "Enviando..." : "Enviar invitación"}</button>
+                      <button type="button" onClick={() => setInviteOpen(false)}>Cancelar</button>
+                    </div>
+                  </form>
+                )}
+              </>
             ) : <button type="button" className="discover-like-button discover-modal-like-button" onClick={() => handleLike(selectedPerson)} disabled={likingIds.includes(selectedPerson.id)}>{likingIds.includes(selectedPerson.id) ? "Enviando..." : "♥ Me gusta"}</button>}
           </section>
         </div>
