@@ -141,6 +141,7 @@ function MessagesPage() {
       setConversations((current) => current.map((item) =>
         item.id === conversationId ? { ...item, unreadCount: 0 } : item
       ));
+      window.dispatchEvent(new Event("linkea:notifications-changed"));
     } catch (err) {
       setError(err.message || "No pudimos cargar los mensajes.");
     } finally {
