@@ -32,9 +32,9 @@ const HomePage = () => {
             <span>Perfil institucional</span>
             <h2>{institution?.name || "Tu institución"}</h2>
             <p>{institution?.type || "Institución cultural"}</p>
-            <small>El panel para buscar talentos estará disponible próximamente.</small>
           </div>
         </section>
+        <DiscoverPeople />
       </main>
     );
   }
