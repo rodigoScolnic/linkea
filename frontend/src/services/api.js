@@ -1,4 +1,4 @@
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3001").replace(/\/$/, "");
+export const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3001").replace(/\/$/, "");
 
 export async function apiRequest(path, { method = "GET", token, body } = {}) {
   const headers = { "Content-Type": "application/json" };
@@ -104,8 +104,15 @@ export const invitationsApi = {
 
 export const conversationsApi = {
   list: (token) => apiRequest("/api/conversations", { token }),
-  messages: (token, conversationId) =>
-    apiRequest(`/api/conversations/${encodeURIComponent(conversationId)}/messages`, { token }),
+  messages: (token, conversationId, options = {}) => {
+    const params = new URLSearchParams();
+    if (options.before) params.set("before", options.before);
+    if (options.limit) params.set("limit", String(options.limit));
+    const query = params.toString();
+    return apiRequest(`/api/conversations/${encodeURIComponent(conversationId)}/messages${query ? `?${query}` : ""}`, { token });
+  },
+  markRead: (token, conversationId) =>
+    apiRequest(`/api/conversations/${encodeURIComponent(conversationId)}/read`, { method: "PATCH", token }),
   sendMessage: (token, conversationId, content) =>
     apiRequest(`/api/conversations/${encodeURIComponent(conversationId)}/messages`, {
       method: "POST",
