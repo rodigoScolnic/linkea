@@ -89,11 +89,11 @@ export function initializeSocket(server) {
           conversationId: z.string().uuid(),
           content: z.string().trim().min(1).max(2000)
         }).parse(payload);
-        const room = `conversation:${parsed.data.conversationId}`;
+        const room = `conversation:${parsed.conversationId}`;
         if (!socket.rooms.has(room)) {
           return acknowledge({ ok: false, error: "Primero tenés que abrir la conversación." });
         }
-        const conversation = await getConversationForUser(parsed.data.conversationId, userId);
+        const conversation = await getConversationForUser(parsed.conversationId, userId);
         if (!conversation) return acknowledge({ ok: false, error: "Conversación no encontrada." });
         const recipientId = getOtherParticipant(conversation, userId);
         if (!recipientId) return acknowledge({ ok: false, error: "No se pudo identificar al destinatario." });
@@ -101,7 +101,7 @@ export function initializeSocket(server) {
         const result = await prisma.$transaction(async (tx) => {
           const message = await tx.message.create({
             data: {
-              conversationId: parsed.data.conversationId,
+              conversationId: parsed.conversationId,
               senderId: userId,
               content: parsed.content
             },
@@ -136,21 +136,21 @@ export function initializeSocket(server) {
     socket.on("conversation:read", async (payload, acknowledge = () => {}) => {
       try {
         const parsed = z.object({ conversationId: z.string().uuid() }).parse(payload);
-        const room = `conversation:${parsed.data.conversationId}`;
+        const room = `conversation:${parsed.conversationId}`;
         if (!socket.rooms.has(room)) return acknowledge({ ok: false, error: "Conversación no abierta." });
-        const conversation = await getConversationForUser(parsed.data.conversationId, userId);
+        const conversation = await getConversationForUser(parsed.conversationId, userId);
         if (!conversation) return acknowledge({ ok: false, error: "Conversación no encontrada." });
         const now = new Date();
         await prisma.message.updateMany({
           where: {
-            conversationId: parsed.data.conversationId,
+            conversationId: parsed.conversationId,
             senderId: { not: userId },
             readAt: null
           },
           data: { readAt: now }
         });
         io.to(room).emit("messages:read", {
-          conversationId: parsed.data.conversationId,
+          conversationId: parsed.conversationId,
           readerId: userId,
           readAt: now.toISOString()
         });
