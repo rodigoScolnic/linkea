@@ -2,7 +2,8 @@ import { useNavigate } from "react-router";
 import HeaderHome from "../components/HeaderHome";
 import Hero from "../components/Hero";
 import DiscoverPeople from "../components/DiscoverPeople";
-import InstitutionFavorites from "../components/InstitutionFavorites";\nimport ProfessionalHub from "../components/ProfessionalHub";
+import InstitutionFavorites from "../components/InstitutionFavorites";
+import ProfessionalHub from "../components/ProfessionalHub";
 import LikesHistory from "../components/LikesHistory";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
@@ -36,7 +37,8 @@ const HomePage = () => {
           </div>
         </section>
         <DiscoverPeople />
-        <InstitutionFavorites />\n        <ProfessionalHub />
+        <InstitutionFavorites />
+        <ProfessionalHub />
       </main>
     );
   }
@@ -52,7 +54,8 @@ const HomePage = () => {
       </div>
       <Hero user={user} />
       <DiscoverPeople />
-      {!isGuest && <LikesHistory />}\n      {!isGuest && <ProfessionalHub />}
+      {!isGuest && <LikesHistory />}
+      {!isGuest && <ProfessionalHub />}
     </main>
   );
 };
