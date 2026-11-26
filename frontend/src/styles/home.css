@@ -2714,3 +2714,21 @@ body:has(.home-page) {
   .messages-match-item { flex-basis: 68px; }
   .messages-match-item img { width: 58px; height: 58px; }
 }
+
+
+/* Acción de cierre de sesión dentro del menú */
+.nav-logout-button {
+  border: 0;
+  padding: 8px 0;
+  background: transparent;
+  color: #b54747;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .2s ease;
+}
+.nav-logout-button:hover { color: #8f2929; }
+@media (max-width: 768px) {
+  .nav-logout-item { width: 100%; }
+  .nav-logout-button { width: 100%; padding: 9px 0; text-align: left; }
+}
