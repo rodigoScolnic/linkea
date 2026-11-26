@@ -1489,3 +1489,204 @@ body:has(.home-page) {
 
 .professional-open-chat-button { align-self:flex-start; margin:0 0 0 76px; padding:7px 11px; border:1px solid var(--linkea-blue-dark); border-radius:8px; background:var(--linkea-blue-dark); color:#fff; font-size:11px; font-weight:700; cursor:pointer; }
 @media(max-width:700px) { .professional-open-chat-button { margin-left:0; } }
+
+
+/* Tarjetas de talentos: fotografía protagonista, inspiración editorial tipo dating app */
+.discover-grid {
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+  align-items: stretch;
+  gap: 22px;
+}
+.discover-tinder-card {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  min-height: 390px;
+  overflow: hidden;
+  border: 1px solid rgba(31, 43, 66, .10);
+  border-radius: 22px;
+  background: #20283a;
+  box-shadow: 0 12px 30px rgba(28, 42, 68, .12);
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.discover-tinder-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px rgba(28, 42, 68, .18);
+}
+.discover-tinder-profile-link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #fff;
+  text-align: left;
+  background: #20283a;
+}
+.discover-tinder-profile-link .discover-card-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  background: linear-gradient(145deg, #dce5f5, #aab9d2);
+  transition: transform .45s ease;
+}
+.discover-tinder-card:hover .discover-card-photo { transform: scale(1.035); }
+.discover-card-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 20, 34, .02) 28%, rgba(13, 20, 34, .22) 52%, rgba(13, 20, 34, .91) 100%);
+  pointer-events: none;
+}
+.discover-tinder-card .discover-card-content {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 24px 20px 19px;
+  color: #fff;
+}
+.discover-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+.discover-card-register,
+.discover-card-location {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 20px;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+}
+.discover-tinder-card .discover-card-content h3 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(19px, 2vw, 23px);
+  line-height: 1.16;
+  letter-spacing: -.35px;
+}
+.discover-tinder-card .discover-card-age { font-weight: 500; }
+.discover-tinder-card .discover-username {
+  margin: 5px 0 0;
+  color: rgba(255,255,255,.78);
+  font-size: 11px;
+}
+.discover-tinder-card .discover-bio {
+  min-height: 0;
+  margin: 10px 0 0;
+  color: rgba(255,255,255,.9);
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+}
+.discover-tinder-card .discover-interests {
+  gap: 5px;
+  margin: 9px 0 0;
+}
+.discover-tinder-card .discover-interests span {
+  padding: 4px 8px;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.13);
+  color: #fff;
+  font-size: 9px;
+}
+.discover-tinder-card .profile-card-link-hint {
+  margin-top: 11px;
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: .2px;
+}
+.discover-tinder-card .profile-card-link-hint span { margin-left: 3px; }
+.discover-tinder-card .discover-card-actions {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  transform: translateY(100%);
+  transition: transform .2s ease;
+  pointer-events: none;
+}
+.discover-tinder-card:hover .discover-card-actions,
+.discover-tinder-card:focus-within .discover-card-actions {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.discover-tinder-card .discover-card-actions .discover-like-button,
+.discover-tinder-card .discover-card-actions .institution-favorite-button {
+  width: 100%;
+  min-height: 48px;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #4268ad;
+  font-size: 13px;
+  font-weight: 800;
+}
+.discover-tinder-card .discover-card-actions .discover-like-button {
+  background: #fff;
+  color: #c94f78;
+}
+.discover-tinder-card .discover-card-actions .institution-favorite-button.is-saved {
+  background: #f7f4e9;
+  color: #98752c;
+}
+.discover-tinder-card .discover-card-actions button:disabled { opacity: .65; }
+.discover-tinder-profile-link:focus-visible {
+  outline: 3px solid #7da4f4;
+  outline-offset: -5px;
+  border-radius: 20px;
+}
+@media (max-width: 700px) {
+  .discover-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+  }
+  .discover-tinder-card {
+    min-height: 300px;
+    aspect-ratio: 3 / 4;
+    border-radius: 17px;
+  }
+  .discover-tinder-card .discover-card-content { padding: 17px 13px 15px; }
+  .discover-tinder-card .discover-card-content h3 { font-size: 17px; }
+  .discover-tinder-card .discover-bio { font-size: 10px; }
+  .discover-tinder-card .discover-card-actions {
+    position: static;
+    transform: none;
+    pointer-events: auto;
+  }
+  .discover-tinder-card .discover-card-actions .discover-like-button,
+  .discover-tinder-card .discover-card-actions .institution-favorite-button {
+    min-height: 43px;
+    padding: 9px 7px;
+    font-size: 11px;
+  }
+  .discover-tinder-card .discover-card-content { bottom: 43px; }
+}
+@media (max-width: 390px) {
+  .discover-grid { gap: 10px; }
+  .discover-tinder-card { min-height: 275px; }
+  .discover-tinder-card .discover-card-content { padding: 14px 11px 12px; }
+  .discover-tinder-card .discover-card-content h3 { font-size: 15px; }
+  .discover-card-register, .discover-card-location { padding: 5px 7px; font-size: 9px; }
+}
