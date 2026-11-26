@@ -28,7 +28,12 @@ function NotificationCenter() {
   useEffect(() => {
     loadNotifications();
     const interval = window.setInterval(loadNotifications, 30000);
-    return () => window.clearInterval(interval);
+    const handleNotificationsChanged = () => loadNotifications();
+    window.addEventListener("linkea:notifications-changed", handleNotificationsChanged);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("linkea:notifications-changed", handleNotificationsChanged);
+    };
   }, [loadNotifications]);
 
   function getNotificationDestination(notification) {
