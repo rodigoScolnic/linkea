@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { notificationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 function NotificationCenter() {
   const { token, isGuest } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -29,14 +31,35 @@ function NotificationCenter() {
     return () => window.clearInterval(interval);
   }, [loadNotifications]);
 
-  async function markRead(notification) {
-    if (notification.readAt) return;
-    try {
-      await notificationsApi.markRead(token, notification.id);
-      setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, readAt: new Date().toISOString() } : item));
-      setUnreadCount((count) => Math.max(0, count - 1));
-      window.dispatchEvent(new Event("linkea:notifications-changed"));
-    } catch (err) { setError(err.message || "No pudimos actualizar la notificación."); }
+  function getNotificationDestination(notification) {
+    const link = notification.link || "";
+    if (link.startsWith("/home/")) return link;
+    const section = link.replace(/^#/, "");
+    const destinations = {
+      contactos: "/home/contactos",
+      oportunidades: "/home/oportunidades",
+      mensajes: "/home/mensajes"
+    };
+    if (destinations[section]) return destinations[section];
+    if (notification.type === "CHAT_MESSAGE") return "/home/mensajes";
+    if (notification.type === "PROFESSIONAL_INVITATION" || notification.type === "INVITATION_RESPONSE") return "/home/contactos";
+    if (notification.type === "NEW_OPPORTUNITY" || notification.type === "NEW_APPLICATION" || notification.type === "APPLICATION_UPDATE") return "/home/oportunidades";
+    return "/home/perfil";
+  }
+
+  async function openNotification(notification) {
+    if (!notification.readAt) {
+      try {
+        await notificationsApi.markRead(token, notification.id);
+        setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, readAt: new Date().toISOString() } : item));
+        setUnreadCount((count) => Math.max(0, count - 1));
+        window.dispatchEvent(new Event("linkea:notifications-changed"));
+      } catch (err) {
+        setError(err.message || "No pudimos actualizar la notificación.");
+        return;
+      }
+    }
+    navigate(getNotificationDestination(notification));
   }
 
   async function markAllRead() {
@@ -62,10 +85,11 @@ function NotificationCenter() {
         <div className="professional-empty"><strong>Estás al día</strong><p>Cuando haya novedades sobre tus invitaciones, oportunidades o postulaciones, las vas a encontrar acá.</p></div>
       ) : (
         <div className="notification-list">
-          {notifications.map((item) => <article key={item.id} className={`notification-item ${item.readAt ? "is-read" : "is-unread"}`} onClick={() => markRead(item)}>
+          {notifications.map((item) => <button type="button" key={item.id} className={`notification-item notification-item-button ${item.readAt ? "is-read" : "is-unread"}`} onClick={() => openNotification(item)}>
             <span className="notification-dot" />
-            <div><strong>{item.title}</strong><p>{item.message}</p><small>{new Date(item.createdAt).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}</small></div>
-          </article>)}
+            <span className="notification-item-copy"><strong>{item.title}</strong><span>{item.message}</span><small>{new Date(item.createdAt).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}</small></span>
+            <span className="notification-open-hint">Abrir →</span>
+          </button>)}
         </div>
       )}
     </section>
