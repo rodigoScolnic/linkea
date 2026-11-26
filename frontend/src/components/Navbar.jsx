@@ -4,7 +4,7 @@ import { API_URL, conversationsApi, notificationsApi, profileApi } from "../serv
 import { io } from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
 import gUser from "../assets/images/genericUser.png";
-import notificationSound from "../assets/notificationSound";
+import notificationSound from "../assets/notificationSound.js";
 import "../styles/home.css";
 
 function Navbar() {
