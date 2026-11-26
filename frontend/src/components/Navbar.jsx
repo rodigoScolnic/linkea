@@ -1,16 +1,45 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";
 import { conversationsApi, notificationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { profileApi } from "../services/api";
+import gUser from "../assets/images/genericUser.png";
 import "../styles/home.css";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
-  const { user, isGuest, token } = useAuth();
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState("");
+  const photoInputRef = useRef(null);
+  const { user, isGuest, token, refreshUser } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
+
+  async function handlePhotoChange(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      setPhotoError("Elegí una imagen JPG, PNG o WEBP.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError("La foto no puede superar los 5 MB.");
+      return;
+    }
+    setPhotoError("");
+    setUploadingPhoto(true);
+    try {
+      await profileApi.uploadPhoto(token, file);
+      await refreshUser();
+    } catch (error) {
+      setPhotoError(error.message || "No se pudo actualizar la foto.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
 
   const loadUnreadNotifications = useCallback(async () => {
     if (!token || isGuest) {
@@ -55,10 +84,22 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <NavLink to="/home/perfil" className="logo" onClick={closeMenu} aria-label="Linkea, inicio">
-        <span className="logo-mark">L</span>
-        <span>linkea</span>
-      </NavLink>
+      <div className="navbar-brand-area">
+        {user && !isGuest ? (
+          <>
+            <button className="navbar-profile-avatar" type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} aria-label="Cambiar foto de perfil" title={uploadingPhoto ? "Subiendo foto..." : "Cambiar foto de perfil"}>
+              <img src={user.profile?.photoUrl || gUser} alt="Tu foto de perfil" />
+              <span aria-hidden="true">{uploadingPhoto ? "…" : "＋"}</span>
+            </button>
+            <input ref={photoInputRef} className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} aria-label="Seleccionar nueva foto de perfil" />
+            {photoError && <span className="navbar-photo-error" role="alert">{photoError}</span>}
+          </>
+        ) : (
+          <NavLink to="/home/perfil" className="logo" onClick={closeMenu} aria-label="Linkea, inicio">
+            <span className="logo-mark">L</span><span>linkea</span>
+          </NavLink>
+        )}
+      </div>
       <button
         className={`hamburger ${menuOpen ? "active" : ""}`}
         onClick={() => setMenuOpen((open) => !open)}
