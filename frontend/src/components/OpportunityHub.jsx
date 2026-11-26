@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { opportunitiesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,6 +12,7 @@ const statusLabels = { SUBMITTED: "Recibida", REVIEWING: "En evaluación", SELEC
 
 function OpportunityHub() {
   const { token, user } = useAuth();
+  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -204,7 +206,9 @@ function OpportunityHub() {
           <div className="opportunities-heading"><div><p className="discover-eyebrow">CANDIDATURAS</p><h3>{selectedOpportunity.title}</h3></div><button type="button" className="opportunity-secondary-button" onClick={() => setSelectedOpportunity(null)}>Cerrar</button></div>
           {applicationsLoading ? <p className="professional-empty">Cargando postulaciones...</p> : applications.length === 0 ? <p className="professional-empty">Todavía no hay postulaciones para esta convocatoria.</p> : applications.map((item) => (
             <article className="opportunity-application-card" key={item.id}>
-              <div><strong>{item.talent?.profile?.displayName || item.talent?.username}</strong><span>{item.talent?.profile?.vocalRegister || "Registro no informado"} · {item.talent?.profile?.city || "Ciudad no informada"}</span><p>{item.message || "Sin mensaje adicional."}</p><small>Estado: {statusLabels[item.status]}</small></div>
+              <button type="button" className="profile-card-link opportunity-applicant-profile" onClick={() => navigate(`/home/talento/${item.talent.id}`)}>
+                <strong>{item.talent?.profile?.displayName || item.talent?.username}</strong><span>{item.talent?.profile?.vocalRegister || "Registro no informado"} · {item.talent?.profile?.city || "Ciudad no informada"}</span><p>{item.message || "Sin mensaje adicional."}</p><small>Estado: {statusLabels[item.status]}</small><span className="profile-card-link-hint">Ver perfil →</span>
+              </button>
               <div className="opportunity-application-actions">
                 {item.status !== "REVIEWING" && <button type="button" onClick={() => updateApplication(item.id, "REVIEWING")}>En evaluación</button>}
                 {item.status !== "SELECTED" && <button type="button" onClick={() => updateApplication(item.id, "SELECTED")}>Seleccionar</button>}
