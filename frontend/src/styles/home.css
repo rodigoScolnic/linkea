@@ -1486,3 +1486,6 @@ body:has(.home-page) {
 .public-profile-card:not(:has(.public-profile-gallery)) { grid-template-columns:minmax(0,1fr); }
 .opportunity-applicant-profile { flex-direction:column; align-items:flex-start; min-width:0; }
 .opportunity-applicant-profile strong { color:var(--linkea-ink); }
+
+.professional-open-chat-button { align-self:flex-start; margin:0 0 0 76px; padding:7px 11px; border:1px solid var(--linkea-blue-dark); border-radius:8px; background:var(--linkea-blue-dark); color:#fff; font-size:11px; font-weight:700; cursor:pointer; }
+@media(max-width:700px) { .professional-open-chat-button { margin-left:0; } }
