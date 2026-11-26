@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";
-import { conversationsApi, notificationsApi } from "../services/api";
+import { conversationsApi, notificationsApi, profileApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { profileApi } from "../services/api";
 import gUser from "../assets/images/genericUser.png";
 import "../styles/home.css";
 
