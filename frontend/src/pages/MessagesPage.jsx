@@ -232,9 +232,6 @@ function MessagesPage() {
         <div>
           <p className="discover-eyebrow">MENSAJERÍA PRIVADA</p>
         </div>
-        <span className={`messages-connection is-${connection}`}>
-          <i />{connection === "connected" ? "Conectado" : connection === "connecting" ? "Conectando..." : "Reconectando..."}
-        </span>
       </div>
 
       {conversations.some((conversation) => conversation.match) && (
@@ -305,7 +302,6 @@ function MessagesPage() {
           {!selectedConversation ? (
             <div className="messages-chat-placeholder">
               <span className="messages-placeholder-icon">✉</span>
-              <strong>Tu espacio de conversación</strong>
               <p>Elegí un contacto para empezar a conversar.</p>
             </div>
           ) : (
