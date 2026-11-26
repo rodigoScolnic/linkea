@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function LikesHistory() {
   const { token, isGuest } = useAuth();
+  const navigate = useNavigate();
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -53,14 +55,17 @@ function LikesHistory() {
             const profile = person?.profile || {};
             return (
               <article className="likes-history-card" key={like.id}>
-                <img src={profile.photoUrl || genericUser} alt={profile.displayName || person.username} loading="lazy" />
-                <div className="likes-history-card-content">
-                  <h3>{profile.displayName || person.username}</h3>
-                  <p className="discover-username">@{person.username}</p>
-                  {profile.city && <p className="discover-city">{profile.city}</p>}
-                  {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
-                  <p className="likes-history-date">Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</p>
-                </div>
+                <button type="button" className="profile-card-link likes-profile-link" onClick={() => navigate(`/home/talento/${person.id}`)} aria-label={`Ver perfil de ${profile.displayName || person.username}`}>
+                  <img src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <div className="likes-history-card-content">
+                    <h3>{profile.displayName || person.username}</h3>
+                    <p className="discover-username">@{person.username}</p>
+                    {profile.city && <p className="discover-city">{profile.city}</p>}
+                    {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
+                    <p className="likes-history-date">Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</p>
+                    <span className="profile-card-link-hint">Ver perfil →</span>
+                  </div>
+                </button>
               </article>
             );
           })}
