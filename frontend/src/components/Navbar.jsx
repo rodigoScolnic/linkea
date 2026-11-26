@@ -84,7 +84,6 @@ function Navbar() {
       const audio = notificationAudioRef.current;
       if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
       window.dispatchEvent(new Event("linkea:notifications-changed"));
-      loadUnreadNotifications();
     });
     return () => socket.disconnect();
   }, [token, isGuest, loadUnreadNotifications]);
