@@ -81,6 +81,7 @@ const Hero = ({ user }) => {
   return (
     <section className="hero" id="mi-perfil">
       <article className="profile-preview profile-preview-expanded">
+        <img className="profile-cover-photo" src={profile.photoUrl || gUser} alt={`Foto de perfil de ${displayName}`} />
         <div className="profile-content">
           <p className="profile-eyebrow">Mi perfil</p><h1>{displayName}</h1><p className="profile-username">@{user.username}</p>
           {profile.city && <p className="profile-city">{profile.city}</p>}
