@@ -231,13 +231,38 @@ function MessagesPage() {
       <div className="messages-heading">
         <div>
           <p className="discover-eyebrow">MENSAJERÍA PRIVADA</p>
-          <h2>Mensajes</h2>
-          <p>Conversá directamente con talentos e instituciones de tu red.</p>
         </div>
         <span className={`messages-connection is-${connection}`}>
           <i />{connection === "connected" ? "Conectado" : connection === "connecting" ? "Conectando..." : "Reconectando..."}
         </span>
       </div>
+
+      {conversations.some((conversation) => conversation.match) && (
+        <section className="messages-matches" aria-label="Tus matches">
+          <div className="messages-matches-heading">
+            <strong>Tus matches</strong>
+            <span>{conversations.filter((conversation) => conversation.match).length}</span>
+          </div>
+          <div className="messages-matches-carousel">
+            {conversations.filter((conversation) => conversation.match).map((conversation) => {
+              const person = personFor(conversation, user?.id);
+              return (
+                <button
+                  type="button"
+                  key={conversation.id}
+                  className={`messages-match-item ${selectedId === conversation.id ? "active" : ""}`}
+                  onClick={() => setSelectedId(conversation.id)}
+                  aria-label={`Abrir conversación con ${personName(person)}`}
+                  title={personName(person)}
+                >
+                  <img src={person?.profile?.photoUrl || person?.institutionProfile?.logoUrl || genericUser} alt="" />
+                  <span>{personName(person)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {error && <p className="discover-status discover-error" role="alert">{error}</p>}
 
