@@ -111,7 +111,7 @@ router.patch("/:id", requireAuth, async (req, res, next) => {
           type: "INVITATION_RESPONSE",
           title: status === "ACCEPTED" ? "Invitación aceptada" : "Invitación rechazada",
           message: `Tu invitación «${updated.title}» fue ${status === "ACCEPTED" ? "aceptada" : "rechazada"}.`,
-          link: "#contactos"
+          link: conversation ? "/home/mensajes?conversationId=" + encodeURIComponent(conversation.id) : "#contactos"
         }
       });
       return { invitation: updated, conversation, notification };
