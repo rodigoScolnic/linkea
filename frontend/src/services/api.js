@@ -67,6 +67,7 @@ export const profileApi = {
 };
 
 export const discoveryApi = {
+  get: (token, userId) => apiRequest(`/api/discover/${encodeURIComponent(userId)}`, { token }),
   list: (token, limit = 20, filters = {}, offset = 0) => {
     const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
     Object.entries(filters).forEach(([key, value]) => {
