@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { API_URL, conversationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import { useSearchParams } from "react-router";
 import genericUser from "../assets/images/genericUser.png";
 
 function personFor(conversation, userId) {
@@ -29,6 +30,8 @@ function upsertMessage(current, message) {
 
 function MessagesPage() {
   const { token, user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const requestedConversationId = searchParams.get("conversationId");
   const [conversations, setConversations] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [messages, setMessages] = useState([]);
@@ -50,14 +53,14 @@ function MessagesPage() {
       const data = await conversationsApi.list(token);
       const items = data.conversations || [];
       setConversations(items);
-      setSelectedId((current) => current || items[0]?.id || "");
+      setSelectedId((current) => current || (items.some((item) => item.id === requestedConversationId) ? requestedConversationId : "") || items[0]?.id || "");
       setError("");
     } catch (err) {
       setError(err.message || "No pudimos cargar tus conversaciones.");
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, requestedConversationId]);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
 
