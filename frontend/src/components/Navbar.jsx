@@ -16,7 +16,7 @@ function Navbar() {
   const photoInputRef = useRef(null);
   const notificationAudioRef = useRef(null);
   const previousUnreadCountRef = useRef(null);
-  const lastRealtimeNotificationAtRef = useRef(0);
+  const pendingRealtimeNotificationCountRef = useRef(0);
   const { user, isGuest, token, refreshUser } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
@@ -57,9 +57,16 @@ function Navbar() {
         conversationsApi.list(token)
       ]);
       const nextUnreadCount = data.unreadCount || 0;
-      if (previousUnreadCountRef.current !== null && nextUnreadCount > previousUnreadCountRef.current) {
-        const audio = notificationAudioRef.current;
-        if (audio && Date.now() - lastRealtimeNotificationAtRef.current > 15000) { audio.currentTime = 0; audio.play().catch(() => {}); }
+      if (previousUnreadCountRef.current === null) {
+        pendingRealtimeNotificationCountRef.current = 0;
+      } else if (nextUnreadCount > previousUnreadCountRef.current) {
+        const increase = nextUnreadCount - previousUnreadCountRef.current;
+        const alreadyPlayed = Math.min(increase, pendingRealtimeNotificationCountRef.current);
+        pendingRealtimeNotificationCountRef.current -= alreadyPlayed;
+        if (increase > alreadyPlayed) {
+          const audio = notificationAudioRef.current;
+          if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
+        }
       }
       previousUnreadCountRef.current = nextUnreadCount;
       setHasUnreadNotifications(nextUnreadCount > 0);
@@ -80,7 +87,7 @@ function Navbar() {
     if (!token || isGuest) return undefined;
     const socket = io(API_URL, { auth: { token }, reconnection: true, reconnectionAttempts: Infinity });
     socket.on("notification:new", () => {
-      lastRealtimeNotificationAtRef.current = Date.now();
+      pendingRealtimeNotificationCountRef.current += 1;
       const audio = notificationAudioRef.current;
       if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
       window.dispatchEvent(new Event("linkea:notifications-changed"));
