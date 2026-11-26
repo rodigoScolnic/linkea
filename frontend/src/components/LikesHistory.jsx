@@ -54,16 +54,25 @@ function LikesHistory() {
             const person = like.toUser;
             const profile = person?.profile || {};
             return (
-              <article className="likes-history-card" key={like.id}>
-                <button type="button" className="profile-card-link likes-profile-link" onClick={() => navigate(`/home/talento/${person.id}`)} aria-label={`Ver perfil de ${profile.displayName || person.username}`}>
-                  <img src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+              <article className="likes-history-card likes-tinder-card" key={like.id}>
+                <button
+                  type="button"
+                  className="profile-card-link likes-profile-link likes-tinder-profile-link"
+                  onClick={() => navigate(`/home/talento/${person.id}`)}
+                  aria-label={`Ver perfil de ${profile.displayName || person.username}`}
+                >
+                  <img className="likes-card-photo" src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <span className="likes-card-shade" aria-hidden="true" />
                   <div className="likes-history-card-content">
+                    <div className="likes-card-tags">
+                      {profile.vocalRegister && <span>{profile.vocalRegister}</span>}
+                      {profile.city && <span>{profile.city}</span>}
+                    </div>
                     <h3>{profile.displayName || person.username}</h3>
-                    <p className="discover-username">@{person.username}</p>
-                    {profile.city && <p className="discover-city">{profile.city}</p>}
-                    {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
-                    <p className="likes-history-date">Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</p>
-                    <span className="profile-card-link-hint">Ver perfil →</span>
+                    <p className="likes-card-username">@{person.username}</p>
+                    {profile.bio && <p className="likes-card-bio">{profile.bio}</p>}
+                    <span className="likes-history-date">♥ Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</span>
+                    <span className="likes-card-hint">Ver perfil <span aria-hidden="true">→</span></span>
                   </div>
                 </button>
               </article>
