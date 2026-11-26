@@ -51,7 +51,7 @@ router.post("/", requireAuth, async (req, res, next) => {
       select: { id: true }
     });
     if (pending) return res.status(409).json({ error: "Ya tenés una invitación pendiente para este talento." });
-    const invitation = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const created = await tx.professionalInvitation.create({
         data: { institutionId: req.user.id, talentId: talent.id, title: data.title, message: data.message },
         include: {
