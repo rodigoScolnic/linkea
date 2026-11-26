@@ -1,17 +1,24 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { discoveryApi } from "../services/api";
+import { discoveryApi, invitationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function PublicProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const isInstitutionViewer = user?.accountType === "INSTITUTION";
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [galleryPage, setGalleryPage] = useState(0);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteTitle, setInviteTitle] = useState("");
+  const [inviteMessage, setInviteMessage] = useState("");
+  const [inviteError, setInviteError] = useState("");
+  const [inviteNotice, setInviteNotice] = useState("");
+  const [sendingInvite, setSendingInvite] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -31,6 +38,24 @@ function PublicProfilePage() {
     return () => { active = false; };
   }, [token, id]);
 
+  async function sendInvitation(event) {
+    event.preventDefault();
+    if (!person || sendingInvite) return;
+    setSendingInvite(true);
+    setInviteError("");
+    setInviteNotice("");
+    try {
+      await invitationsApi.create(token, { talentId: person.id, title: inviteTitle, message: inviteMessage });
+      setInviteNotice("Invitación enviada correctamente.");
+      setInviteOpen(false);
+      setInviteTitle("");
+      setInviteMessage("");
+    } catch (err) {
+      setInviteError(err.message || "No pudimos enviar la invitación.");
+    } finally {
+      setSendingInvite(false);
+    }
+  }
   if (loading) return <section className="public-profile-page"><p className="professional-empty">Cargando perfil...</p></section>;
   if (error || !person) return <section className="public-profile-page"><button className="public-profile-back" onClick={() => navigate(-1)}>← Volver</button><p className="discover-status discover-error">{error || "Perfil no encontrado."}</p></section>;
 
@@ -72,6 +97,23 @@ function PublicProfilePage() {
               {profile.languages?.length > 0 && <p className="public-profile-meta">Idiomas: {profile.languages.join(", ")}</p>}
               {profile.repertoire?.length > 0 && <div className="public-profile-meta"><strong>Repertorio</strong><p>{profile.repertoire.join(" · ")}</p></div>}
               {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.map((item) => <span key={item}>{item}</span>)}</div>}
+              {isInstitutionViewer && !isInstitution && (
+                <div className="public-profile-invitation">
+                  {inviteNotice && <p className="professional-notice">{inviteNotice}</p>}
+                  {!inviteOpen ? <button type="button" className="professional-invite-button" onClick={() => setInviteOpen(true)}>Enviar invitación profesional</button> : (
+                    <form className="professional-invite-form" onSubmit={sendInvitation}>
+                      <h3>Invitar a colaborar</h3>
+                      <label>Asunto<input value={inviteTitle} onChange={(event) => setInviteTitle(event.target.value)} minLength={3} maxLength={120} required placeholder="Ej. Audición para próxima temporada" /></label>
+                      <label>Mensaje<textarea value={inviteMessage} onChange={(event) => setInviteMessage(event.target.value)} minLength={10} maxLength={2000} required rows={3} placeholder="Contale al artista de qué se trata la propuesta..." /></label>
+                      {inviteError && <p className="discover-status discover-error" role="alert">{inviteError}</p>}
+                      <div className="professional-invite-actions">
+                        <button type="submit" disabled={sendingInvite}>{sendingInvite ? "Enviando..." : "Enviar invitación"}</button>
+                        <button type="button" onClick={() => setInviteOpen(false)}>Cancelar</button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
