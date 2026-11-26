@@ -28,25 +28,12 @@ function InstitutionProfile({ institution }) {
 }
 
 const HomePage = () => {
-  const { user, isGuest, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user, isGuest } = useAuth();
   const isInstitution = !isGuest && user?.accountType === "INSTITUTION";
-
-  function handleLogout() {
-    logout();
-    navigate("/", { replace: true });
-  }
 
   return (
     <main className="home-page">
       <HeaderHome />
-      <div className="home-toolbar">
-        <span>{isGuest ? "Modo visitante" : isInstitution ? "Espacio institucional" : "Mi espacio"}</span>
-        <button type="button" className="logout-button" onClick={handleLogout}>
-          {isGuest ? "Salir del modo visitante" : "Cerrar sesión"}
-        </button>
-      </div>
-
       <div className="home-tab-content">
         <Routes>
           <Route index element={<Navigate to="perfil" replace />} />
