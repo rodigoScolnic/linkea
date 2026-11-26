@@ -1377,7 +1377,7 @@ body:has(.home-page) {
 .profile-preview-expanded .profile-interests span { padding:5px 9px; font-size:10px; }
 .profile-preview-expanded .profile-details { margin-top:12px; padding-top:9px; }
 .profile-preview-expanded .profile-edit-button { margin-top:12px; }
-.profile-preview-expanded .profile-gallery { display:flex; flex-direction:column; min-width:0; min-height:0; margin:0; padding:0 0 0 20px; border:0; border-left:1px solid var(--linkea-line); }
+.profile-preview-expanded .profile-gallery { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:0; margin:0; padding:0 0 0 20px; border:0; border-left:1px solid var(--linkea-line); }
 .profile-preview-expanded .profile-gallery-heading { flex:0 0 auto; align-items:center; }
 .profile-preview-expanded .profile-gallery-heading h2 { font-size:19px; }
 .profile-preview-expanded .profile-gallery-heading p { font-size:10px; }
