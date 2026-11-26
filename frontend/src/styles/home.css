@@ -1312,7 +1312,7 @@ body:has(.home-page) {
 
 /* Mensajes: ocupar el espacio disponible del viewport en pantallas estrechas */
 @media (max-width: 700px) {
-  .home-tab-content {
+  .home-tab-content:has(.messages-page) {
     display: flex;
     flex-direction: column;
     min-height: 0;
