@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { favoritesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function InstitutionFavorites() {
   const { token, user } = useAuth();
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -71,16 +73,19 @@ function InstitutionFavorites() {
             const name = profile.displayName || talent.username;
             return (
               <article className="institution-favorite-card" key={talentId}>
-                <img src={profile.photoUrl || genericUser} alt={`Foto de ${name}`} loading="lazy" />
-                <div className="institution-favorite-card-content">
-                  <h3>{name}</h3>
-                  <p className="discover-username">@{talent.username}</p>
-                  {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
-                  {profile.city && <p className="discover-city">{profile.city}</p>}
-                  <button type="button" onClick={() => removeFavorite(talentId)} disabled={removingId === talentId}>
-                    {removingId === talentId ? "Quitando..." : "Quitar de favoritos"}
-                  </button>
-                </div>
+                <button type="button" className="profile-card-link" onClick={() => navigate(`/home/talento/${talentId}`)}>
+                  <img src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <div className="institution-favorite-card-content">
+                    <h3>{name}</h3>
+                    <p className="discover-username">@{talent.username}</p>
+                    {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
+                    {profile.city && <p className="discover-city">{profile.city}</p>}
+                    <span className="profile-card-link-hint">Ver perfil →</span>
+                  </div>
+                </button>
+                <button type="button" onClick={() => removeFavorite(talentId)} disabled={removingId === talentId}>
+                  {removingId === talentId ? "Quitando..." : "Quitar de favoritos"}
+                </button>
               </article>
             );
           })}
