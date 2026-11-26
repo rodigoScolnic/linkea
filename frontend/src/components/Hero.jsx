@@ -8,17 +8,15 @@ const splitList = (value) => value.split(",").map((item) => item.trim()).filter(
 
 const Hero = ({ user }) => {
   const { token, refreshUser } = useAuth();
-  const fileInputRef = useRef(null);
   const mediaInputRef = useRef(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
-  const [photoError, setPhotoError] = useState("");
   const [mediaError, setMediaError] = useState("");
   const [profileError, setProfileError] = useState("");
   const [profileNotice, setProfileNotice] = useState("");
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [deletingMedia, setDeletingMedia] = useState("");
+  const [galleryPage, setGalleryPage] = useState(0);
 
   if (!user) return (
     <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
@@ -32,6 +30,9 @@ const Hero = ({ user }) => {
   const profile = user.profile || {};
   const displayName = profile.displayName || user.username || "Tu perfil";
   const media = profile.media || [];
+  const galleryPageSize = 4;
+  const galleryPageCount = Math.max(1, Math.ceil(media.length / galleryPageSize));
+  const visibleMedia = media.slice(galleryPage * galleryPageSize, (galleryPage + 1) * galleryPageSize);
 
   function startEditing() {
     setForm({
@@ -57,15 +58,6 @@ const Hero = ({ user }) => {
     } catch (error) { setProfileError(error.message || "No pudimos guardar los cambios."); }
   }
 
-  async function handlePhotoChange(event) {
-    const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return setPhotoError("Elegí una imagen JPG, PNG o WEBP.");
-    if (file.size > 5 * 1024 * 1024) return setPhotoError("La foto no puede superar los 5 MB.");
-    setPhotoError(""); setUploadingPhoto(true);
-    try { await profileApi.uploadPhoto(token, file); await refreshUser(); }
-    catch (error) { setPhotoError(error.message || "No se pudo subir la foto."); }
-    finally { setUploadingPhoto(false); }
-  }
 
   async function handleMediaChange(event) {
     const selected = Array.from(event.target.files || []); event.target.value = ""; if (!selected.length) return;
@@ -89,14 +81,8 @@ const Hero = ({ user }) => {
   return (
     <section className="hero" id="mi-perfil">
       <article className="profile-preview profile-preview-expanded">
-        <div className="profile-avatar-wrap">
-          <img className="profile-avatar" src={profile.photoUrl || gUser} alt={`Foto de perfil de ${displayName}`} />
-          <button className="profile-photo-button" type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingPhoto}>{uploadingPhoto ? "Subiendo..." : profile.photoUrl ? "Cambiar foto principal" : "Agregar foto principal"}</button>
-          <input ref={fileInputRef} className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} aria-label="Seleccionar foto de perfil" />
-        </div>
-        {photoError && <p className="profile-photo-error" role="alert">{photoError}</p>}
         <div className="profile-content">
-          <p className="profile-eyebrow">Bienvenido a Linkea</p><h1>{displayName}</h1><p className="profile-username">@{user.username}</p>
+          <p className="profile-eyebrow">Mi perfil</p><h1>{displayName}</h1><p className="profile-username">@{user.username}</p>
           {profile.city && <p className="profile-city">{profile.city}</p>}
           {profile.vocalRegister && <p className="profile-vocal-register">Registro vocal: <strong>{profile.vocalRegister}</strong></p>}
           {profile.bio && <p className="profile-bio">{profile.bio}</p>}
@@ -133,10 +119,15 @@ const Hero = ({ user }) => {
           </div>
           <p className="profile-gallery-hint">JPG, PNG, WEBP, MP4 o WEBM. Hasta 50 MB por archivo.</p>
           {mediaError && <p className="profile-photo-error" role="alert">{mediaError}</p>}
-          {media.length ? <div className="profile-gallery-grid">{media.map((item) => <div className="profile-gallery-item" key={item.id}>
+          {media.length ? <div className="profile-gallery-grid">{visibleMedia.map((item) => <div className="profile-gallery-item" key={item.id}>
             {item.type === "video" ? <video src={item.url} controls preload="metadata" /> : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}
             <button type="button" onClick={() => removeMedia(item)} disabled={deletingMedia === item.id}>{deletingMedia === item.id ? "Eliminando..." : "Eliminar"}</button>
           </div>)}</div> : <p className="profile-gallery-empty">Todavía no agregaste fotos ni videos.</p>}
+          {media.length > galleryPageSize && <div className="profile-gallery-pagination">
+            <button type="button" onClick={() => setGalleryPage((page) => Math.max(0, page - 1))} disabled={galleryPage === 0}>Anterior</button>
+            <span>{galleryPage + 1} / {galleryPageCount}</span>
+            <button type="button" onClick={() => setGalleryPage((page) => Math.min(galleryPageCount - 1, page + 1))} disabled={galleryPage >= galleryPageCount - 1}>Siguiente</button>
+          </div>}
         </section>
       </article>
     </section>
