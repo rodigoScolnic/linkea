@@ -99,6 +99,11 @@ function ProfessionalHub() {
                     <span className="profile-card-link-hint">Ver perfil →</span>
                   </div>
                 </button>
+                {invitation.status === "ACCEPTED" && invitation.conversation?.id && (
+                  <button type="button" className="professional-open-chat-button" onClick={() => navigate(`/home/mensajes?conversationId=${invitation.conversation.id}`)}>
+                    Abrir conversación
+                  </button>
+                )}
                 {!isInstitution && invitation.status === "PENDING" && (
                   <div className="professional-invitation-actions">
                     <button type="button" onClick={() => respondToInvitation(invitation.id, "ACCEPTED")} disabled={respondingId === invitation.id}>
