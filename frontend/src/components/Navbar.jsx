@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router";
-import { conversationsApi, notificationsApi, profileApi } from "../services/api";
+import { API_URL, conversationsApi, notificationsApi, profileApi } from "../services/api";
+import { io } from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
 import gUser from "../assets/images/genericUser.png";
 import notificationSound from "../assets/notificationSound";
@@ -15,6 +16,7 @@ function Navbar() {
   const photoInputRef = useRef(null);
   const notificationAudioRef = useRef(null);
   const previousUnreadCountRef = useRef(null);
+  const lastRealtimeNotificationAtRef = useRef(0);
   const { user, isGuest, token, refreshUser } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
@@ -57,7 +59,7 @@ function Navbar() {
       const nextUnreadCount = data.unreadCount || 0;
       if (previousUnreadCountRef.current !== null && nextUnreadCount > previousUnreadCountRef.current) {
         const audio = notificationAudioRef.current;
-        if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
+        if (audio && Date.now() - lastRealtimeNotificationAtRef.current > 15000) { audio.currentTime = 0; audio.play().catch(() => {}); }
       }
       previousUnreadCountRef.current = nextUnreadCount;
       setHasUnreadNotifications(nextUnreadCount > 0);
@@ -73,6 +75,18 @@ function Navbar() {
     notificationAudioRef.current = audio;
     return () => { audio.pause(); notificationAudioRef.current = null; };
   }, []);
+
+  useEffect(() => {
+    if (!token || isGuest) return undefined;
+    const socket = io(API_URL, { auth: { token }, reconnection: true, reconnectionAttempts: Infinity });
+    socket.on("notification:new", () => {
+      lastRealtimeNotificationAtRef.current = Date.now();
+      const audio = notificationAudioRef.current;
+      if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
+      loadUnreadNotifications();
+    });
+    return () => socket.disconnect();
+  }, [token, isGuest, loadUnreadNotifications]);
 
   useEffect(() => {
     loadUnreadNotifications();
