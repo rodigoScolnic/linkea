@@ -1308,3 +1308,51 @@ body:has(.home-page) {
     padding-bottom: 12px;
   }
 }
+
+
+/* Mensajes: ocupar el espacio disponible del viewport en pantallas estrechas */
+@media (max-width: 700px) {
+  .home-tab-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .messages-page {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    height: auto;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .messages-heading {
+    flex: 0 0 auto;
+    margin-bottom: 12px;
+  }
+
+  .messages-layout {
+    display: block;
+    flex: 1 1 0;
+    min-height: 0;
+    height: auto;
+  }
+
+  .messages-sidebar,
+  .messages-chat {
+    height: 100%;
+    min-height: 0;
+  }
+
+  .messages-layout.has-selection .messages-chat {
+    display: flex;
+    min-height: 0;
+  }
+
+  .messages-thread {
+    min-height: 0;
+    max-height: none;
+  }
+}
