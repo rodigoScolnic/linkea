@@ -1474,3 +1474,15 @@ body:has(.home-page) {
   .notification-open-hint { display:none; }
   .professional-invitation-actions { margin-left:0; }
 }
+
+/* Ajustes de estructura para tarjetas con contenido interactivo */
+.likes-history-card > .profile-card-link > img { flex:0 0 76px; width:76px; height:76px; border-radius:12px; object-fit:cover; background:#f4f6fb; }
+.professional-profile-link > img { flex:0 0 48px; width:48px; height:48px; border-radius:12px; object-fit:cover; background:#edf1f8; }
+.institution-favorite-card > .profile-card-link { flex:1 1 auto; align-items:center; gap:14px; min-width:0; }
+.institution-favorite-card > .profile-card-link > img { flex:0 0 88px; width:88px; height:104px; border-radius:12px; object-fit:cover; background:#edf1f8; }
+.institution-favorite-card > button:last-child { align-self:flex-end; margin-top:10px; padding:7px 9px; border:1px solid #e8d8a8; border-radius:8px; background:#fffaf0; color:#98752c; font-size:11px; font-weight:700; cursor:pointer; }
+.institution-favorite-card > button:last-child:disabled { opacity:.6; cursor:wait; }
+.notification-item-button { border:1px solid var(--linkea-line); border-radius:13px; padding:14px; background:#fff; }
+.public-profile-card:not(:has(.public-profile-gallery)) { grid-template-columns:minmax(0,1fr); }
+.opportunity-applicant-profile { flex-direction:column; align-items:flex-start; min-width:0; }
+.opportunity-applicant-profile strong { color:var(--linkea-ink); }
