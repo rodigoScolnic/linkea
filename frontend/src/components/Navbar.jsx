@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import { conversationsApi, notificationsApi, profileApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import gUser from "../assets/images/genericUser.png";
+import notificationSound from "../assets/notificationSound";
 import "../styles/home.css";
 
 function Navbar() {
@@ -12,6 +13,8 @@ function Navbar() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoError, setPhotoError] = useState("");
   const photoInputRef = useRef(null);
+  const notificationAudioRef = useRef(null);
+  const previousUnreadCountRef = useRef(null);
   const { user, isGuest, token, refreshUser } = useAuth();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
@@ -51,12 +54,25 @@ function Navbar() {
         notificationsApi.list(token),
         conversationsApi.list(token)
       ]);
-      setHasUnreadNotifications((data.unreadCount || 0) > 0);
+      const nextUnreadCount = data.unreadCount || 0;
+      if (previousUnreadCountRef.current !== null && nextUnreadCount > previousUnreadCountRef.current) {
+        const audio = notificationAudioRef.current;
+        if (audio) { audio.currentTime = 0; audio.play().catch(() => {}); }
+      }
+      previousUnreadCountRef.current = nextUnreadCount;
+      setHasUnreadNotifications(nextUnreadCount > 0);
       setHasUnreadMessages((conversationsData.conversations || []).some((conversation) => conversation.unreadCount > 0));
     } catch {
       // Keep navigation usable if notifications are temporarily unavailable.
     }
   }, [token, isGuest]);
+
+  useEffect(() => {
+    const audio = new Audio(notificationSound);
+    audio.preload = "auto";
+    notificationAudioRef.current = audio;
+    return () => { audio.pause(); notificationAudioRef.current = null; };
+  }, []);
 
   useEffect(() => {
     loadUnreadNotifications();
