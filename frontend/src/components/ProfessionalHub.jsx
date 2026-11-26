@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { invitationsApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function ProfessionalHub() {
   const { token, user } = useAuth();
+  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -81,29 +83,30 @@ function ProfessionalHub() {
             const person = getPerson(invitation);
             return (
               <article className="professional-invitation-card" key={invitation.id}>
-                <img src={person?.profile?.photoUrl || person?.institutionProfile?.logoUrl || genericUser} alt="" />
-                <div className="professional-invitation-content">
-                  <div className="professional-invitation-topline">
-                    <strong>{getPersonName(person)}</strong>
-                    <span className={`professional-status status-${invitation.status.toLowerCase()}`}>
-                      {invitation.status === "PENDING" ? "Pendiente" : invitation.status === "ACCEPTED" ? "Aceptada" : "Rechazada"}
-                    </span>
-                  </div>
-                  <h4>{invitation.title}</h4>
-                  <p>{invitation.message}</p>
-                  <small>{new Date(invitation.createdAt).toLocaleDateString("es-AR")}</small>
-                  {!isInstitution && invitation.status === "PENDING" && (
-                    <div className="professional-invitation-actions">
-                      <button type="button" onClick={() => respondToInvitation(invitation.id, "ACCEPTED")} disabled={respondingId === invitation.id}>
-                        {respondingId === invitation.id ? "Procesando..." : "Aceptar"}
-                      </button>
-                      <button type="button" onClick={() => respondToInvitation(invitation.id, "REJECTED")} disabled={respondingId === invitation.id}>Rechazar</button>
+                <button type="button" className="profile-card-link professional-profile-link" onClick={() => person?.id && navigate(`/home/talento/${person.id}`)}>
+                  <img src={person?.profile?.photoUrl || person?.institutionProfile?.logoUrl || genericUser} alt="" />
+                  <div className="professional-invitation-content">
+                    <div className="professional-invitation-topline">
+                      <strong>{getPersonName(person)}</strong>
+                      <span className={`professional-status status-${invitation.status.toLowerCase()}`}>
+                        {invitation.status === "PENDING" ? "Pendiente" : invitation.status === "ACCEPTED" ? "Aceptada" : "Rechazada"}
+                      </span>
                     </div>
-                  )}
-                  {invitation.status === "ACCEPTED" && (
-                    <p className="professional-invitation-accepted">Conversación habilitada en Mensajes.</p>
-                  )}
-                </div>
+                    <h4>{invitation.title}</h4>
+                    <p>{invitation.message}</p>
+                    <small>{new Date(invitation.createdAt).toLocaleDateString("es-AR")}</small>
+                    {invitation.status === "ACCEPTED" && <p className="professional-invitation-accepted">Conversación habilitada en Mensajes.</p>}
+                    <span className="profile-card-link-hint">Ver perfil →</span>
+                  </div>
+                </button>
+                {!isInstitution && invitation.status === "PENDING" && (
+                  <div className="professional-invitation-actions">
+                    <button type="button" onClick={() => respondToInvitation(invitation.id, "ACCEPTED")} disabled={respondingId === invitation.id}>
+                      {respondingId === invitation.id ? "Procesando..." : "Aceptar"}
+                    </button>
+                    <button type="button" onClick={() => respondToInvitation(invitation.id, "REJECTED")} disabled={respondingId === invitation.id}>Rechazar</button>
+                  </div>
+                )}
               </article>
             );
           })}
