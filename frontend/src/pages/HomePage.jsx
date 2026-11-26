@@ -8,6 +8,7 @@ import MessagesPage from "./MessagesPage";
 import OpportunityHub from "../components/OpportunityHub";
 import NotificationCenter from "../components/NotificationCenter";
 import LikesHistory from "../components/LikesHistory";
+import PublicProfilePage from "./PublicProfilePage";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
 
@@ -53,6 +54,7 @@ const HomePage = () => {
             ? <InstitutionProfile institution={user?.institutionProfile} />
             : <Hero user={user} />} />
           <Route path="descubrir" element={<DiscoverPeople />} />
+          {!isGuest && <Route path="talento/:id" element={<PublicProfilePage />} />}
           {!isGuest && (isInstitution
             ? <Route path="favoritos" element={<InstitutionFavorites />} />
             : <Route path="likes" element={<LikesHistory />} />)}
