@@ -73,7 +73,7 @@ const Hero = ({ user }) => {
   async function removeMedia(item) {
     if (!window.confirm("¿Querés eliminar este archivo de tu galería?")) return;
     setDeletingMedia(item.id); setMediaError("");
-    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); }
+    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); setGalleryPage(0); }
     catch (error) { setMediaError(error.message || "No se pudo eliminar el archivo."); }
     finally { setDeletingMedia(""); }
   }
