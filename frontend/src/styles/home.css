@@ -1622,13 +1622,7 @@ body:has(.home-page) {
   left: 0;
   margin: 0;
   padding: 0;
-  transform: translateY(100%);
-  transition: transform .2s ease;
-  pointer-events: none;
-}
-.discover-tinder-card:hover .discover-card-actions,
-.discover-tinder-card:focus-within .discover-card-actions {
-  transform: translateY(0);
+  transform: none;
   pointer-events: auto;
 }
 .discover-tinder-card .discover-card-actions .discover-like-button,
@@ -1671,7 +1665,8 @@ body:has(.home-page) {
   .discover-tinder-card .discover-card-content h3 { font-size: 17px; }
   .discover-tinder-card .discover-bio { font-size: 10px; }
   .discover-tinder-card .discover-card-actions {
-    position: static;
+    position: absolute;
+    bottom: 0;
     transform: none;
     pointer-events: auto;
   }
