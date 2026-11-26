@@ -1549,6 +1549,7 @@ body:has(.home-page) {
   left: 0;
   width: 100%;
   padding: 24px 20px 19px;
+  bottom: 49px;
   color: #fff;
 }
 .discover-card-tags {
