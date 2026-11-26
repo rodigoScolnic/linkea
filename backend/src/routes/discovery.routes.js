@@ -66,4 +66,24 @@ router.get("/", requireAuth, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+
+router.get("/:id", requireAuth, async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.params.id },
+      select: {
+        id: true,
+        username: true,
+        accountType: true,
+        profile: { include: { media: { orderBy: { createdAt: "desc" } } } },
+        institutionProfile: true
+      }
+    });
+    if (!user || (user.accountType === "TALENT" && !user.profile) || (user.accountType === "INSTITUTION" && !user.institutionProfile)) {
+      return res.status(404).json({ error: "No encontramos ese perfil." });
+    }
+    res.json({ user });
+  } catch (error) { next(error); }
+});
+
 export default router;
