@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { discoveryApi, favoritesApi, invitationsApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
@@ -7,6 +8,7 @@ const initialFilters = { vocalRegister: "", minAge: "", maxAge: "", city: "" };
 
 function DiscoverPeople() {
   const { token, isGuest, user } = useAuth();
+  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [people, setPeople] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -221,16 +223,20 @@ function DiscoverPeople() {
             const age = profile.birthDate ? Math.floor((Date.now() - new Date(profile.birthDate).getTime()) / 31557600000) : null;
             return (
               <article className="discover-card" key={person.id}>
-                <img className="discover-card-photo" src={profile.photoUrl || genericUser} alt={`Foto de ${name}`} loading="lazy" />
-                <div className="discover-card-content">
-                  <h3>{name}</h3>
-                  <p className="discover-username">@{person.username}</p>
-                  {age !== null && <p className="discover-city">{age} años</p>}
-                  {profile.city && <p className="discover-city">{profile.city}</p>}
-                  {profile.vocalRegister && <p className="discover-vocal-register">{profile.vocalRegister}</p>}
-                  {profile.bio && <p className="discover-bio">{profile.bio}</p>}
-                  {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
-                  <button type="button" className="discover-view-button" onClick={() => { setLikeError(""); setSelectedPerson(person); }}>Ver perfil</button>
+                <button type="button" className="profile-card-link discover-profile-link" onClick={() => navigate(`/home/talento/${person.id}`)}>
+                  <img className="discover-card-photo" src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <div className="discover-card-content">
+                    <h3>{name}</h3>
+                    <p className="discover-username">@{person.username}</p>
+                    {age !== null && <p className="discover-city">{age} años</p>}
+                    {profile.city && <p className="discover-city">{profile.city}</p>}
+                    {profile.vocalRegister && <p className="discover-vocal-register">{profile.vocalRegister}</p>}
+                    {profile.bio && <p className="discover-bio">{profile.bio}</p>}
+                    {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
+                    <span className="profile-card-link-hint">Ver perfil →</span>
+                  </div>
+                </button>
+                <div className="discover-card-actions">
                   {isInstitution ? (
                     <button type="button" className={`institution-favorite-button ${favoriteIds.includes(person.id) ? "is-saved" : ""}`} onClick={() => toggleFavorite(person)} disabled={favoriteBusyIds.includes(person.id)}>
                       {favoriteBusyIds.includes(person.id) ? "Guardando..." : favoriteIds.includes(person.id) ? "★ Guardado" : "☆ Guardar talento"}
