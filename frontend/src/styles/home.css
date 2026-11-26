@@ -2459,3 +2459,19 @@ body:has(.home-page) {
     flex-direction: column;
   }
 }
+
+
+/* Perfil personal sin foto duplicada: priorizar los datos desde el inicio */
+.hero > .profile-preview-expanded {
+  border-radius: 18px;
+}
+
+.hero .profile-preview-expanded > .profile-content {
+  padding-top: 30px;
+}
+
+@media (max-width: 560px) {
+  .hero .profile-preview-expanded > .profile-content {
+    padding-top: 23px;
+  }
+}
