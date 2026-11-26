@@ -126,7 +126,7 @@ router.post("/:id/messages", requireAuth, async (req, res, next) => {
           type: "CHAT_MESSAGE",
           title: "Nuevo mensaje",
           message: content.length > 120 ? `${content.slice(0, 117)}...` : content,
-          link: "/home/mensajes"
+          link: `/home/mensajes?conversationId=${encodeURIComponent(id)}`
         }
       });
       return { message, notification };
