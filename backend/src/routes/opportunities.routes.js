@@ -54,7 +54,7 @@ router.post("/", requireAuth, async (req, res, next) => {
       deadline: z.string().datetime().optional().nullable()
     }).parse(req.body);
 
-    const opportunity = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const created = await tx.opportunity.create({
         data: {
           ...data,
@@ -120,7 +120,7 @@ router.post("/:id/applications", requireAuth, async (req, res, next) => {
     if (!opportunity || opportunity.status !== "OPEN" || (opportunity.deadline && opportunity.deadline < new Date())) {
       return res.status(404).json({ error: "Esta oportunidad ya no está disponible." });
     }
-    const application = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const created = await tx.application.create({
         data: { opportunityId: id, talentId: req.user.id, message: message || null }
       });
