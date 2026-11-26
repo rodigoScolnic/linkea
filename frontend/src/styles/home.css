@@ -1391,7 +1391,8 @@ body:has(.home-page) {
 .profile-gallery-pagination button { padding:6px 10px; border:1px solid var(--linkea-line); border-radius:8px; background:#fff; color:var(--linkea-blue-dark); font-size:10px; font-weight:700; cursor:pointer; }
 .profile-gallery-pagination button:disabled { opacity:.4; cursor:not-allowed; }
 .home-tab-content:has(.hero) { display:flex; flex-direction:column; overflow:hidden; }
-.profile-preview-expanded .profile-edit-form { grid-column:1/-1; overflow:auto; }
+.profile-preview-expanded { position:relative; }
+.profile-preview-expanded .profile-edit-form { position:absolute; z-index:5; inset:12px; width:auto; max-height:calc(100% - 24px); margin:0; padding:20px; border:1px solid var(--linkea-line); border-radius:16px; background:#fff; box-shadow:0 12px 35px rgba(32,40,58,.12); overflow-y:auto; }
 @media(max-width:700px) {
   .navbar { min-height:62px; }
   .navbar-profile-avatar { width:40px; height:40px; }
