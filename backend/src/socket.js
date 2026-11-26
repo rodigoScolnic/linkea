@@ -114,7 +114,7 @@ export function initializeSocket(server) {
               message: parsed.content.length > 120
                 ? `${parsed.content.slice(0, 117)}...`
                 : parsed.content,
-              link: "/home/mensajes"
+              link: `/home/mensajes?conversationId=${encodeURIComponent(parsed.conversationId)}`
             }
           });
           return { message, notification };
