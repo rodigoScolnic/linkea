@@ -2628,3 +2628,94 @@ body:has(.home-page) {
   border-radius: 0;
   object-fit: cover;
 }
+
+
+/* Carrusel de matches en mensajería */
+.messages-matches {
+  margin: 0 0 20px;
+  padding: 15px 17px 13px;
+  border: 1px solid var(--linkea-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 7px 22px rgba(36,52,84,.04);
+}
+.messages-matches-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+.messages-matches-heading strong {
+  color: var(--linkea-ink);
+  font-size: 13px;
+}
+.messages-matches-heading span {
+  display: grid;
+  min-width: 21px;
+  height: 21px;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 20px;
+  background: #eef3ff;
+  color: var(--linkea-blue-dark);
+  font-size: 10px;
+  font-weight: 800;
+}
+.messages-matches-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+.messages-match-item {
+  display: flex;
+  flex: 0 0 76px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--linkea-ink);
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+.messages-match-item img {
+  display: block;
+  width: 66px;
+  height: 66px;
+  padding: 3px;
+  border: 2px solid #dce6fa;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f0f3f9;
+  transition: border-color .18s ease, transform .18s ease;
+}
+.messages-match-item:hover img,
+.messages-match-item.active img {
+  transform: translateY(-2px);
+  border-color: var(--linkea-blue);
+}
+.messages-match-item span {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: #59657b;
+  font-size: 10px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.messages-match-item.active span {
+  color: var(--linkea-blue-dark);
+  font-weight: 800;
+}
+@media (max-width: 700px) {
+  .messages-matches { flex: 0 0 auto; margin-bottom: 12px; padding: 12px 13px 9px; }
+  .messages-matches-carousel { gap: 13px; }
+  .messages-match-item { flex-basis: 68px; }
+  .messages-match-item img { width: 58px; height: 58px; }
+}
