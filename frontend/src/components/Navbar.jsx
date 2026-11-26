@@ -76,7 +76,7 @@ function Navbar() {
 
   useEffect(() => {
     loadUnreadNotifications();
-    const interval = window.setInterval(loadUnreadNotifications, 30000);
+    const interval = window.setInterval(loadUnreadNotifications, 10000);
     const handleNotificationsChanged = () => loadUnreadNotifications();
     window.addEventListener("linkea:notifications-changed", handleNotificationsChanged);
     return () => {
