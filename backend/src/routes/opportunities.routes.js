@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getIO } from "../realtime.js";
 
 const router = Router();
 async function accountType(userId) {
@@ -78,9 +79,13 @@ router.post("/", requireAuth, async (req, res, next) => {
           }))
         });
       }
-      return created;
+      return { opportunity: created, recipientIds: talents.map((talent) => talent.id) };
     });
-    res.status(201).json({ opportunity });
+    const io = getIO();
+    result.recipientIds.forEach((recipientId) => io?.to("user:" + recipientId).emit("notification:new", {
+      type: "NEW_OPPORTUNITY", title: "Nueva oportunidad en Linkea", message: result.opportunity.title, link: "#oportunidades"
+    }));
+    res.status(201).json({ opportunity: result.opportunity });
   } catch (error) { next(error); }
 });
 
@@ -119,7 +124,7 @@ router.post("/:id/applications", requireAuth, async (req, res, next) => {
       const created = await tx.application.create({
         data: { opportunityId: id, talentId: req.user.id, message: message || null }
       });
-      await tx.notification.create({
+      const notification = await tx.notification.create({
         data: {
           recipientId: opportunity.institutionId,
           actorId: req.user.id,
@@ -129,9 +134,10 @@ router.post("/:id/applications", requireAuth, async (req, res, next) => {
           link: "#oportunidades"
         }
       });
-      return created;
+      return { application: created, notification };
     });
-    res.status(201).json({ application });
+    getIO()?.to("user:" + opportunity.institutionId).emit("notification:new", result.notification);
+    res.status(201).json({ application: result.application });
   } catch (error) {
     if (error?.code === "P2002") return res.status(409).json({ error: "Ya te postulaste a esta oportunidad." });
     next(error);
@@ -149,7 +155,7 @@ router.patch("/:id/applications/:applicationId", requireAuth, async (req, res, n
     if (!application) return res.status(404).json({ error: "Postulación no encontrada." });
     const updated = await prisma.$transaction(async (tx) => {
       const result = await tx.application.update({ where: { id: applicationId }, data: { status } });
-      await tx.notification.create({
+      const notification = await tx.notification.create({
         data: {
           recipientId: application.talentId,
           actorId: req.user.id,
@@ -159,9 +165,10 @@ router.patch("/:id/applications/:applicationId", requireAuth, async (req, res, n
           link: "#oportunidades"
         }
       });
-      return result;
+      return { application: result, notification };
     });
-    res.json({ application: updated });
+    getIO()?.to("user:" + application.talentId).emit("notification:new", updated.notification);
+    res.json({ application: updated.application });
   } catch (error) { next(error); }
 });
 
