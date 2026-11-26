@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getIO } from "../realtime.js";
 
 const router = Router();
 
@@ -58,7 +59,7 @@ router.post("/", requireAuth, async (req, res, next) => {
           talent: { select: { id: true, username: true, profile: true } }
         }
       });
-      await tx.notification.create({
+      const notification = await tx.notification.create({
         data: {
           recipientId: talent.id,
           actorId: req.user.id,
@@ -68,9 +69,10 @@ router.post("/", requireAuth, async (req, res, next) => {
           link: "#contactos"
         }
       });
-      return created;
+      return { invitation: created, notification };
     });
-    res.status(201).json({ invitation });
+    getIO()?.to("user:" + talent.id).emit("notification:new", result.notification);
+    res.status(201).json({ invitation: result.invitation });
   } catch (error) { next(error); }
 });
 
@@ -102,7 +104,7 @@ router.patch("/:id", requireAuth, async (req, res, next) => {
       const conversation = status === "ACCEPTED"
         ? await tx.conversation.create({ data: { invitationId: id } })
         : null;
-      await tx.notification.create({
+      const notification = await tx.notification.create({
         data: {
           recipientId: updated.institutionId,
           actorId: req.user.id,
@@ -112,9 +114,10 @@ router.patch("/:id", requireAuth, async (req, res, next) => {
           link: "#contactos"
         }
       });
-      return { invitation: updated, conversation };
+      return { invitation: updated, conversation, notification };
     });
-    res.json(result);
+    getIO()?.to("user:" + result.invitation.institutionId).emit("notification:new", result.notification);
+    res.json({ invitation: result.invitation, conversation: result.conversation });
   } catch (error) { next(error); }
 });
 
