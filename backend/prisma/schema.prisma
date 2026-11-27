@@ -57,6 +57,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile Profile?
+  subscription Subscription?
   institutionProfile InstitutionProfile?
   likesSent Like[] @relation("LikesSent")
   likesReceived Like[] @relation("LikesReceived")
