@@ -4,7 +4,9 @@ const TALENT_FEATURES = [
   "profile_visitors",
   "expanded_portfolio",
   "advanced_discovery_filters",
-  "availability_calendar"
+  "availability_calendar",
+  "received_likes",
+  "initiate_institution_chats"
 ];
 
 const INSTITUTION_FEATURES = [
@@ -18,10 +20,8 @@ const INSTITUTION_FEATURES = [
 const ACCESS_STATUSES = new Set(["ACTIVE", "TRIALING"]);
 
 export function buildEntitlements(user, subscription, now = new Date()) {
-  const expectedPlan = user.accountType === "TALENT"
-    ? "TALENT_PREMIUM"
-    : "INSTITUTION_PREMIUM";
-
+  const isTalent = user.accountType === "TALENT";
+  const expectedPlan = isTalent ? "TALENT_PREMIUM" : "INSTITUTION_PREMIUM";
   const periodEnd = subscription?.currentPeriodEnd
     ? new Date(subscription.currentPeriodEnd)
     : null;
@@ -29,8 +29,6 @@ export function buildEntitlements(user, subscription, now = new Date()) {
     && !Number.isNaN(periodEnd.getTime())
     && periodEnd > now;
 
-  // A cancellation scheduled for period end keeps access until that date.
-  // PAST_DUE and immediate cancellations do not grant Premium access.
   const statusAllowsAccess = subscription && (
     ACCESS_STATUSES.has(subscription.status)
     || (subscription.status === "CANCELED" && subscription.cancelAtPeriodEnd === true)
@@ -42,9 +40,7 @@ export function buildEntitlements(user, subscription, now = new Date()) {
     && subscription.plan === expectedPlan
   );
 
-  const availableFeatures = user.accountType === "TALENT"
-    ? TALENT_FEATURES
-    : INSTITUTION_FEATURES;
+  const availableFeatures = isTalent ? TALENT_FEATURES : INSTITUTION_FEATURES;
 
   return {
     accountType: user.accountType,
@@ -53,8 +49,21 @@ export function buildEntitlements(user, subscription, now = new Date()) {
     status: isPremium ? subscription.status : "FREE",
     currentPeriodEnd: isPremium ? periodEnd : null,
     cancelAtPeriodEnd: isPremium && subscription.cancelAtPeriodEnd === true,
+    limits: isTalent
+      ? {
+          dailyLikes: isPremium ? 20 : 5,
+          simultaneousApplications: isPremium ? 10 : 2,
+          photos: isPremium ? 10 : 2,
+          videos: isPremium ? 5 : 1,
+          canSeeReceivedLikes: isPremium,
+          canInitiateInstitutionChats: isPremium
+        }
+      : null,
     features: Object.fromEntries(
-      availableFeatures.map((feature) => [feature, isPremium])
+      availableFeatures.map((feature) => [
+        feature,
+        isPremium || (isTalent && feature !== "received_likes" && feature !== "initiate_institution_chats")
+      ])
     )
   };
 }
