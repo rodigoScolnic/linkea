@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { discoveryApi, favoritesApi, invitationsApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
@@ -8,7 +7,6 @@ const initialFilters = { vocalRegister: "", minAge: "", maxAge: "", city: "" };
 
 function DiscoverPeople() {
   const { token, isGuest, user } = useAuth();
-  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [people, setPeople] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -222,18 +220,29 @@ function DiscoverPeople() {
             const isLiking = likingIds.includes(person.id);
             const age = profile.birthDate ? Math.floor((Date.now() - new Date(profile.birthDate).getTime()) / 31557600000) : null;
             return (
-              <article className="discover-card" key={person.id}>
-                <button type="button" className="profile-card-link discover-profile-link" onClick={() => navigate(`/home/talento/${person.id}`)}>
+              <article className="discover-card discover-tinder-card" key={person.id}>
+                <button
+                  type="button"
+                  className="profile-card-link discover-profile-link discover-tinder-profile-link"
+                  onClick={() => setSelectedPerson(person)}
+                  aria-label={`Ver perfil de ${name}`}
+                >
                   <img className="discover-card-photo" src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <span className="discover-card-shade" aria-hidden="true" />
                   <div className="discover-card-content">
-                    <h3>{name}</h3>
+                    <div className="discover-card-tags">
+                      {profile.vocalRegister && <span className="discover-card-register">{profile.vocalRegister}</span>}
+                      {profile.city && <span className="discover-card-location">{profile.city}</span>}
+                    </div>
+                    <h3>{name}{age !== null && <span className="discover-card-age">, {age}</span>}</h3>
                     <p className="discover-username">@{person.username}</p>
-                    {age !== null && <p className="discover-city">{age} años</p>}
-                    {profile.city && <p className="discover-city">{profile.city}</p>}
-                    {profile.vocalRegister && <p className="discover-vocal-register">{profile.vocalRegister}</p>}
                     {profile.bio && <p className="discover-bio">{profile.bio}</p>}
-                    {profile.interests?.length > 0 && <div className="discover-interests">{profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}</div>}
-                    <span className="profile-card-link-hint">Ver perfil →</span>
+                    {profile.interests?.length > 0 && (
+                      <div className="discover-interests">
+                        {profile.interests.slice(0, 3).map((interest) => <span key={interest}>{interest}</span>)}
+                      </div>
+                    )}
+                    <span className="profile-card-link-hint">Ver perfil completo <span aria-hidden="true">↗</span></span>
                   </div>
                 </button>
                 <div className="discover-card-actions">

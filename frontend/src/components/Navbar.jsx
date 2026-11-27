@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { API_URL, conversationsApi, notificationsApi, profileApi } from "../services/api";
 import { io } from "socket.io-client";
 import { useAuth } from "../context/AuthContext";
@@ -17,9 +17,16 @@ function Navbar() {
   const notificationAudioRef = useRef(null);
   const previousUnreadCountRef = useRef(null);
   const pendingRealtimeNotificationCountRef = useRef(0);
-  const { user, isGuest, token, refreshUser } = useAuth();
+  const { user, isGuest, token, refreshUser, logout } = useAuth();
+  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
+
+  function handleLogout() {
+    logout();
+    closeMenu();
+    navigate("/", { replace: true });
+  }
 
   async function handlePhotoChange(event) {
     const file = event.target.files?.[0];
@@ -167,6 +174,11 @@ function Navbar() {
             </NavLink>
           </li>
         ))}
+        <li className="nav-logout-item">
+          <button type="button" className="nav-logout-button" onClick={handleLogout}>
+            {isGuest ? "Salir del modo visitante" : "Cerrar sesión"}
+          </button>
+        </li>
       </ul>
     </nav>
   );

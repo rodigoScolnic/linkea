@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function LikesHistory() {
   const { token, isGuest } = useAuth();
-  const navigate = useNavigate();
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -54,21 +53,86 @@ function LikesHistory() {
             const person = like.toUser;
             const profile = person?.profile || {};
             return (
-              <article className="likes-history-card" key={like.id}>
-                <button type="button" className="profile-card-link likes-profile-link" onClick={() => navigate(`/home/talento/${person.id}`)} aria-label={`Ver perfil de ${profile.displayName || person.username}`}>
-                  <img src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+              <article className="likes-history-card likes-tinder-card" key={like.id}>
+                <button
+                  type="button"
+                  className="profile-card-link likes-profile-link likes-tinder-profile-link"
+                  onClick={() => setSelectedPerson(person)}
+                  aria-label={`Ver perfil de ${profile.displayName || person.username}`}
+                >
+                  <img className="likes-card-photo" src={profile.photoUrl || genericUser} alt="" loading="lazy" />
+                  <span className="likes-card-shade" aria-hidden="true" />
                   <div className="likes-history-card-content">
+                    <div className="likes-card-tags">
+                      {profile.vocalRegister && <span>{profile.vocalRegister}</span>}
+                      {profile.city && <span>{profile.city}</span>}
+                    </div>
                     <h3>{profile.displayName || person.username}</h3>
-                    <p className="discover-username">@{person.username}</p>
-                    {profile.city && <p className="discover-city">{profile.city}</p>}
-                    {profile.vocalRegister && <span className="discover-vocal-register">{profile.vocalRegister}</span>}
-                    <p className="likes-history-date">Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</p>
-                    <span className="profile-card-link-hint">Ver perfil →</span>
+                    <p className="likes-card-username">@{person.username}</p>
+                    {profile.bio && <p className="likes-card-bio">{profile.bio}</p>}
+                    <span className="likes-history-date">♥ Like enviado el {new Date(like.createdAt).toLocaleDateString("es-AR")}</span>
+                    <span className="likes-card-hint">Ver perfil <span aria-hidden="true">→</span></span>
                   </div>
                 </button>
               </article>
             );
           })}
+        </div>
+      )}
+
+      {selectedPerson && (
+        <div className="discover-modal-backdrop" role="presentation" onClick={() => setSelectedPerson(null)}>
+          <section
+            className="discover-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="likes-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button className="discover-modal-close" type="button" onClick={() => setSelectedPerson(null)} aria-label="Cerrar">×</button>
+            <img
+              className="discover-modal-photo"
+              src={selectedPerson.profile?.photoUrl || genericUser}
+              alt={`Foto de ${selectedPerson.profile?.displayName || selectedPerson.username}`}
+            />
+            <p className="discover-eyebrow">Perfil de Linkea</p>
+            <h2 id="likes-modal-title">{selectedPerson.profile?.displayName || selectedPerson.username}</h2>
+            <p className="discover-username">@{selectedPerson.username}</p>
+            {selectedPerson.profile?.city && <p className="discover-city">{selectedPerson.profile.city}</p>}
+            {selectedPerson.profile?.vocalRegister && <p className="discover-vocal-register">{selectedPerson.profile.vocalRegister}</p>}
+            {selectedPerson.profile?.bio && <p className="discover-modal-bio">{selectedPerson.profile.bio}</p>}
+            {selectedPerson.profile?.gender && <p className="discover-city">Género: {selectedPerson.profile.gender}</p>}
+            {selectedPerson.profile?.experience && <p className="discover-city">Experiencia: {selectedPerson.profile.experience}</p>}
+            {selectedPerson.profile?.languages?.length > 0 && <p className="discover-city">Idiomas: {selectedPerson.profile.languages.join(", ")}</p>}
+            {selectedPerson.profile?.repertoire?.length > 0 && (
+              <div className="discover-modal-repertoire">
+                <strong>Repertorio</strong>
+                <p>{selectedPerson.profile.repertoire.join(" · ")}</p>
+              </div>
+            )}
+            {selectedPerson.profile?.interests?.length > 0 && (
+              <div className="discover-interests discover-modal-interests">
+                {selectedPerson.profile.interests.map((interest) => <span key={interest}>{interest}</span>)}
+              </div>
+            )}
+            {selectedPerson.profile?.media?.length > 0 && (
+              <div className="discover-public-gallery">
+                <h3>Galería</h3>
+                <div className="profile-gallery-grid">
+                  {selectedPerson.profile.media.map((item) => (
+                    <div className="profile-gallery-item" key={item.id}>
+                      {item.type === "video"
+                        ? <video src={item.url} controls preload="metadata" />
+                        : <img src={item.url} alt={item.fileName || "Imagen de la galería"} loading="lazy" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p className="discover-like-notice likes-modal-confirmation">
+              ♥ Ya le diste Me gusta a este perfil
+            </p>
+          </section>
         </div>
       )}
     </section>
