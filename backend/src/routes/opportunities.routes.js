@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getIO } from "../realtime.js";
+import { getUserEntitlements } from "../services/user-entitlements.js";
 
 const router = Router();
 async function accountType(userId) {
@@ -120,7 +121,27 @@ router.post("/:id/applications", requireAuth, async (req, res, next) => {
     if (!opportunity || opportunity.status !== "OPEN" || (opportunity.deadline && opportunity.deadline < new Date())) {
       return res.status(404).json({ error: "Esta oportunidad ya no está disponible." });
     }
+    const entitlementResult = await getUserEntitlements(req.user.id);
+    if (!entitlementResult) return res.status(404).json({ error: "Usuario no encontrado." });
+    const limit = entitlementResult.entitlements.limits.simultaneousApplications;
+
     const result = await prisma.$transaction(async (tx) => {
+      const alreadyApplied = await tx.application.findUnique({
+        where: { opportunityId_talentId: { opportunityId: id, talentId: req.user.id } },
+        select: { id: true }
+      });
+      if (alreadyApplied) return { alreadyApplied: true };
+
+      const activeApplications = await tx.application.count({
+        where: {
+          talentId: req.user.id,
+          status: { in: ["SUBMITTED", "REVIEWING", "SELECTED"] }
+        }
+      });
+      if (activeApplications >= limit) {
+        return { limitReached: true, limit, used: activeApplications };
+      }
+
       const created = await tx.application.create({
         data: { opportunityId: id, talentId: req.user.id, message: message || null }
       });
@@ -135,7 +156,17 @@ router.post("/:id/applications", requireAuth, async (req, res, next) => {
         }
       });
       return { application: created, notification };
-    });
+    }, { isolationLevel: "Serializable" });
+
+    if (result.alreadyApplied) return res.status(409).json({ error: "Ya te postulaste a esta oportunidad." });
+    if (result.limitReached) {
+      return res.status(429).json({
+        code: "APPLICATION_LIMIT",
+        error: `Ya tenés ${result.used} postulaciones simultáneas, que es el máximo de tu plan. Cerrá una postulación o pasate a Premium para llegar a 10.`,
+        limit: result.limit,
+        used: result.used
+      });
+    }
     getIO()?.to("user:" + opportunity.institutionId).emit("notification:new", result.notification);
     res.status(201).json({ application: result.application });
   } catch (error) {
