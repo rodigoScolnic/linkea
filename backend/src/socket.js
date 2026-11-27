@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { prisma } from "./db.js";
 import { setIO } from "./realtime.js";
+import { getUserEntitlements } from "./services/user-entitlements.js";
 
 const participantFilter = (userId) => ({
   OR: [
@@ -95,6 +96,34 @@ export function initializeSocket(server) {
         if (!conversation) return acknowledge({ ok: false, error: "Conversación no encontrada." });
         const recipientId = getOtherParticipant(conversation, userId);
         if (!recipientId) return acknowledge({ ok: false, error: "No se pudo identificar al destinatario." });
+
+        const senderResult = await getUserEntitlements(userId);
+        const recipient = await prisma.user.findUnique({
+          where: { id: recipientId },
+          select: { id: true, accountType: true }
+        });
+        if (!senderResult || !recipient) {
+          return acknowledge({ ok: false, error: "No se pudo validar a los participantes." });
+        }
+
+        if (
+          senderResult.user.accountType === "TALENT"
+          && recipient.accountType === "INSTITUTION"
+          && !senderResult.entitlements.limits.canInitiateInstitutionChats
+        ) {
+          const institutionInvited = conversation.invitation?.institutionId === recipientId;
+          const institutionAlreadyMessaged = institutionInvited || await prisma.message.findFirst({
+            where: { conversationId: parsed.conversationId, senderId: recipientId },
+            select: { id: true }
+          });
+          if (!institutionAlreadyMessaged) {
+            return acknowledge({
+              ok: false,
+              code: "PREMIUM_REQUIRED",
+              error: "Con el plan gratuito podés responder a instituciones que te escriban primero. Premium te permite iniciar la conversación."
+            });
+          }
+        }
 
         const result = await prisma.$transaction(async (tx) => {
           const message = await tx.message.create({
