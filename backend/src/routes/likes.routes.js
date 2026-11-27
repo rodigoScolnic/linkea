@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getUserEntitlements } from "../services/user-entitlements.js";
+import { buildEntitlements } from "../services/entitlements.js";
 
 const router = Router();
 
@@ -97,7 +98,6 @@ router.post("/:userId", requireAuth, async (req, res, next) => {
         where: { fromUserId_toUserId: { fromUserId: req.user.id, toUserId: userId } }
       });
       if (!existing && sender.accountType === "TALENT") {
-        const { buildEntitlements } = await import("../services/entitlements.js");
         const entitlements = buildEntitlements(sender, sender.subscription);
         const dayStart = argentinaDayStart();
         const used = await tx.like.count({
