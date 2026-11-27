@@ -22,19 +22,6 @@ const Hero = ({ user }) => {
   const [deletingMedia, setDeletingMedia] = useState("");
   const [galleryPage, setGalleryPage] = useState(0);
 
-  if (!user) return (
-    <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
-      <img className="profile-avatar" src={gUser} alt="Perfil de visitante" />
-      <div className="profile-content"><p className="profile-eyebrow">Modo visitante</p><h1>¡Bienvenido a Linkea!</h1>
-        <p className="profile-bio">Estás explorando Linkea como visitante. Creá una cuenta o iniciá sesión para completar tu perfil y empezar a conectar.</p>
-      </div>
-    </article></section>
-  );
-
-  const profile = user.profile || {};
-  const isTalent = user.accountType === "TALENT";
-  const isPremium = Boolean(subscription?.isPremium);
-  const limits = subscription?.limits;
   useEffect(() => {
     let active = true;
     if (!isTalent || !token) return undefined;
@@ -50,7 +37,22 @@ const Hero = ({ user }) => {
       })
       .catch(() => { if (active) setUsage((current) => ({ ...current, loading: false })); });
     return () => { active = false; };
-  }, [isTalent, token, profile.media?.length]);
+  }, [isTalent, token, user?.profile?.media?.length]);
+
+  if (!user) return (
+    <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
+      <img className="profile-avatar" src={gUser} alt="Perfil de visitante" />
+      <div className="profile-content"><p className="profile-eyebrow">Modo visitante</p><h1>¡Bienvenido a Linkea!</h1>
+        <p className="profile-bio">Estás explorando Linkea como visitante. Creá una cuenta o iniciá sesión para completar tu perfil y empezar a conectar.</p>
+      </div>
+    </article></section>
+  );
+
+  const profile = user.profile || {};
+  const isTalent = user.accountType === "TALENT";
+  const isPremium = Boolean(subscription?.isPremium);
+  const limits = subscription?.limits;
+
   const displayName = profile.displayName || user.username || "Tu perfil";
   const media = profile.media || [];
   const galleryPageSize = 4;
