@@ -13,12 +13,13 @@ function ReceivedLikes() {
 
   useEffect(() => {
     let active = true;
+    if (!subscription?.isPremium) { setLoading(false); return undefined; }
     likesApi.listReceived(token)
       .then((data) => { if (active) setLikes(data.likes || []); })
       .catch((err) => { if (active) setError(err.message || "No pudimos cargar los likes recibidos."); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [token]);
+  }, [token, subscription?.isPremium]);
 
   if (!subscription?.isPremium) {
     return (
