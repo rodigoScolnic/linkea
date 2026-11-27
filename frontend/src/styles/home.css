@@ -2732,3 +2732,61 @@ body:has(.home-page) {
   .nav-logout-item { width: 100%; }
   .nav-logout-button { width: 100%; padding: 9px 0; text-align: left; }
 }
+
+
+/* Plan Premium: indicadores compactos integrados al perfil existente */
+.premium-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 11px;
+  padding: 6px 11px;
+  border: 1px solid #e2e8f2;
+  border-radius: 20px;
+  background: #f6f8fc;
+  color: #69758a;
+  font-size: 11px;
+  font-weight: 750;
+}
+.premium-plan-chip.is-premium {
+  border-color: #dce5ff;
+  background: #f0f4ff;
+  color: #496bc0;
+}
+.premium-usage-card {
+  margin-top: 19px;
+  padding: 15px 16px;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: #fbfcfe;
+}
+.premium-usage-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.premium-usage-heading strong { color: #344057; font-size: 12px; }
+.premium-usage-heading button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #5279c8;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.premium-usage-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 13px;
+}
+.premium-usage-stats span { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.premium-usage-stats strong { color: #26334b; font-size: 15px; font-weight: 800; }
+.premium-usage-stats small { color: #7b8497; font-size: 10px; line-height: 1.35; }
+.profile-gallery-quota { margin-top: 5px !important; color: #5279c8 !important; font-weight: 700; }
+@media (max-width: 480px) {
+  .premium-usage-card { padding: 13px 12px; }
+  .premium-usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; }
+}
