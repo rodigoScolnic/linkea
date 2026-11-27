@@ -50,3 +50,36 @@ test("does not grant access for past-due, immediate cancellation, or wrong plan"
   assert.equal(buildEntitlements(talent, { ...activeTalent, status: "CANCELED", cancelAtPeriodEnd: false }, now).isPremium, false);
   assert.equal(buildEntitlements(talent, { ...activeTalent, plan: "INSTITUTION_PREMIUM" }, now).isPremium, false);
 });
+
+test("exposes the requested free talent limits and disables premium-only actions", () => {
+  const result = buildEntitlements(talent, null, now);
+  assert.deepEqual(result.limits, {
+    dailyLikes: 5,
+    simultaneousApplications: 2,
+    photos: 2,
+    videos: 1,
+    canSeeReceivedLikes: false,
+    canInitiateInstitutionChats: false
+  });
+  assert.equal(hasFeature(result, "received_likes"), false);
+  assert.equal(hasFeature(result, "initiate_institution_chats"), false);
+});
+
+test("exposes the requested talent premium limits and enables premium-only actions", () => {
+  const result = buildEntitlements(talent, activeTalent, now);
+  assert.deepEqual(result.limits, {
+    dailyLikes: 20,
+    simultaneousApplications: 10,
+    photos: 10,
+    videos: 5,
+    canSeeReceivedLikes: true,
+    canInitiateInstitutionChats: true
+  });
+  assert.equal(hasFeature(result, "received_likes"), true);
+  assert.equal(hasFeature(result, "initiate_institution_chats"), true);
+});
+
+test("does not apply talent limits to institution accounts", () => {
+  const result = buildEntitlements(institution, null, now);
+  assert.equal(result.limits, null);
+});
