@@ -17,7 +17,7 @@ function Navbar() {
   const notificationAudioRef = useRef(null);
   const previousUnreadCountRef = useRef(null);
   const pendingRealtimeNotificationCountRef = useRef(0);
-  const { user, isGuest, token, refreshUser, logout } = useAuth();
+  const { user, isGuest, token, refreshUser, logout, subscription } = useAuth();
   const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const closeMenu = () => setMenuOpen(false);
@@ -132,10 +132,17 @@ function Navbar() {
       <div className="navbar-brand-area">
         {user && !isGuest ? (
           <>
-            <button className="navbar-profile-avatar" type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} aria-label="Cambiar foto de perfil" title={uploadingPhoto ? "Subiendo foto..." : "Cambiar foto de perfil"}>
-              <img src={user.profile?.photoUrl || gUser} alt="Tu foto de perfil" />
-              <span aria-hidden="true">{uploadingPhoto ? "…" : "＋"}</span>
-            </button>
+            <div className="navbar-account-summary">
+              <button className="navbar-profile-avatar" type="button" onClick={() => photoInputRef.current?.click()} disabled={uploadingPhoto} aria-label="Cambiar foto de perfil" title={uploadingPhoto ? "Subiendo foto..." : "Cambiar foto de perfil"}>
+                <img src={user.profile?.photoUrl || gUser} alt="Tu foto de perfil" />
+                <span aria-hidden="true">{uploadingPhoto ? "…" : "＋"}</span>
+              </button>
+              {subscription && (
+                <span className={`navbar-plan-badge ${subscription.isPremium ? "is-premium" : "is-free"}`}>
+                  {subscription.isPremium ? "✦ PREMIUM" : "FREE"}
+                </span>
+              )}
+            </div>
             <input ref={photoInputRef} className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} aria-label="Seleccionar nueva foto de perfil" />
             {photoError && <span className="navbar-photo-error" role="alert">{photoError}</span>}
           </>
