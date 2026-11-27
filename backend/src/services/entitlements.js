@@ -62,7 +62,7 @@ export function buildEntitlements(user, subscription, now = new Date()) {
     features: Object.fromEntries(
       availableFeatures.map((feature) => [
         feature,
-        isPremium || (isTalent && feature !== "received_likes" && feature !== "initiate_institution_chats")
+        isPremium
       ])
     )
   };
