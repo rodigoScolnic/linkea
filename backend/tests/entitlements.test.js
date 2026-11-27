@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildEntitlements, hasFeature } from "../services/entitlements.js";
+import { buildEntitlements, hasFeature } from "../src/services/entitlements.js";
 
 const now = new Date("2026-11-27T12:00:00.000Z");
 const talent = { accountType: "TALENT" };
