@@ -9,6 +9,19 @@ enum AccountType {
   INSTITUTION
 }
 
+enum PremiumPlan {
+  TALENT_PREMIUM
+  INSTITUTION_PREMIUM
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
 enum InvitationStatus {
   PENDING
   ACCEPTED
@@ -44,6 +57,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profile Profile?
+  subscription Subscription?
   institutionProfile InstitutionProfile?
   likesSent Like[] @relation("LikesSent")
   likesReceived Like[] @relation("LikesReceived")
@@ -222,4 +236,22 @@ model Notification {
   recipient User @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
   actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
   @@index([recipientId, readAt, createdAt])
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  plan                   PremiumPlan
+  status                 SubscriptionStatus @default(TRIALING)
+  provider               String?
+  providerCustomerId     String?
+  providerSubscriptionId String?            @unique
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, currentPeriodEnd])
 }
