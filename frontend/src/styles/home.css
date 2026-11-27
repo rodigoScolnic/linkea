@@ -2843,3 +2843,20 @@ body:has(.home-page) {
 @media (max-width: 560px) {
   .premium-chat-prompt { align-items: flex-start; flex-direction: column; }
 }
+
+
+.professional-premium-invite {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0;
+  padding: 15px 17px;
+  border: 1px solid #e4eafa;
+  border-radius: 14px;
+  background: #f8faff;
+}
+.professional-premium-invite strong { color: #344057; font-size: 13px; }
+.professional-premium-invite p { margin: 5px 0 0; color: #68738a; font-size: 12px; line-height: 1.5; }
+.professional-premium-invite button { flex: 0 0 auto; padding: 9px 13px; border: 0; border-radius: 9px; background: #5279c8; color: #fff; font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
+@media (max-width: 560px) { .professional-premium-invite { align-items: flex-start; flex-direction: column; } }
