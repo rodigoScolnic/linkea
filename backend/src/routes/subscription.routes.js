@@ -29,10 +29,30 @@ router.get("/me", requireAuth, async (req, res, next) => {
     const subscription = await prisma.subscription.findUnique({
       where: { userId: user.id }
     });
+    const entitlements = buildEntitlements(user, subscription);
+    let usage = null;
 
-    return res.json({
-      subscription: buildEntitlements(user, subscription)
-    });
+    if (user.accountType === "TALENT") {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
+      const date = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+      const dayStart = new Date(`${date.year}-${date.month}-${date.day}T03:00:00.000Z`);
+      const [dailyLikes, activeApplications, photos, videos] = await Promise.all([
+        prisma.like.count({ where: { fromUserId: user.id, createdAt: { gte: dayStart } } }),
+        prisma.application.count({
+          where: { talentId: user.id, status: { in: ["SUBMITTED", "REVIEWING", "SELECTED"] } }
+        }),
+        prisma.profileMedia.count({ where: { type: "image", profile: { is: { userId: user.id } } } }),
+        prisma.profileMedia.count({ where: { type: "video", profile: { is: { userId: user.id } } } })
+      ]);
+      usage = { dailyLikes, activeApplications, photos, videos };
+    }
+
+    return res.json({ subscription: entitlements, usage });
   } catch (error) {
     return next(error);
   }
