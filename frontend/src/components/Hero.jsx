@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gUser from "../assets/images/genericUser.png";
 import { useAuth } from "../context/AuthContext";
 import { profileApi } from "../services/api";
@@ -8,7 +8,7 @@ const emptyForm = { displayName: "", bio: "", city: "", vocalRegister: "", gende
 const splitList = (value) => value.split(",").map((item) => item.trim()).filter(Boolean);
 
 const Hero = ({ user }) => {
-  const { token, refreshUser, subscription } = useAuth();
+  const { token, refreshUser, refreshSubscription, subscription } = useAuth();
   const navigate = useNavigate();
   const isTalent = user?.accountType === "TALENT";
   const mediaInputRef = useRef(null);
@@ -20,6 +20,10 @@ const Hero = ({ user }) => {
   const [form, setForm] = useState(emptyForm);
   const [deletingMedia, setDeletingMedia] = useState("");
   const [galleryPage, setGalleryPage] = useState(0);
+
+  useEffect(() => {
+    if (isTalent && token) refreshSubscription().catch(() => {});
+  }, [token, isTalent]);
 
   if (!user) return (
     <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
@@ -71,7 +75,7 @@ const Hero = ({ user }) => {
     setMediaError(valid.length !== selected.length ? "Se aceptan JPG, PNG, WEBP, MP4 y WEBM de hasta 50 MB cada uno." : "");
     if (!valid.length) return;
     setUploadingMedia(true);
-    try { for (const file of valid) await profileApi.uploadMedia(token, file); await refreshUser(); }
+    try { for (const file of valid) await profileApi.uploadMedia(token, file); await refreshUser(); await refreshSubscription(); }
     catch (error) { setMediaError(error.message || "No se pudo subir el archivo."); }
     finally { setUploadingMedia(false); }
   }
@@ -79,7 +83,7 @@ const Hero = ({ user }) => {
   async function removeMedia(item) {
     if (!window.confirm("¿Querés eliminar este archivo de tu galería?")) return;
     setDeletingMedia(item.id); setMediaError("");
-    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); setGalleryPage(0); }
+    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); await refreshSubscription(); setGalleryPage(0); }
     catch (error) { setMediaError(error.message || "No se pudo eliminar el archivo."); }
     finally { setDeletingMedia(""); }
   }
