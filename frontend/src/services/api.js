@@ -15,11 +15,19 @@ export async function apiRequest(path, { method = "GET", token, body } = {}) {
     : await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data?.error || "No se pudo completar la solicitud.");
+    const error = new Error(data?.error || "No se pudo completar la solicitud.");
+    error.code = data?.code;
+    error.status = response.status;
+    error.details = data;
+    throw error;
   }
 
   return data;
 }
+
+export const subscriptionApi = {
+  me: (token) => apiRequest("/api/subscription/me", { token }),
+};
 
 export const authApi = {
   login: (identifier, password) =>
@@ -79,6 +87,7 @@ export const discoveryApi = {
 
 export const likesApi = {
   listSent: (token) => apiRequest("/api/likes", { token }),
+  listReceived: (token) => apiRequest("/api/likes/received", { token }),
   like: (token, userId) =>
     apiRequest(`/api/likes/${encodeURIComponent(userId)}`, { method: "POST", token }),
   unlike: (token, userId) =>
