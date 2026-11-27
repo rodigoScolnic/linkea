@@ -8,6 +8,8 @@ import MessagesPage from "./MessagesPage";
 import OpportunityHub from "../components/OpportunityHub";
 import NotificationCenter from "../components/NotificationCenter";
 import LikesHistory from "../components/LikesHistory";
+import ReceivedLikes from "../components/ReceivedLikes";
+import PremiumPlanPage from "./PremiumPlanPage";
 import PublicProfilePage from "./PublicProfilePage";
 import { useAuth } from "../context/AuthContext";
 import "../styles/home.css";
@@ -44,7 +46,8 @@ const HomePage = () => {
           {!isGuest && <Route path="talento/:id" element={<PublicProfilePage />} />}
           {!isGuest && (isInstitution
             ? <Route path="favoritos" element={<InstitutionFavorites />} />
-            : <Route path="likes" element={<LikesHistory />} />)}
+            : <><Route path="likes" element={<LikesHistory />} /><Route path="likes-recibidos" element={<ReceivedLikes />} /></>)}
+          {!isGuest && <Route path="plan" element={<PremiumPlanPage />} />}
           {!isGuest && <Route path="contactos" element={<ProfessionalHub />} />}
           {!isGuest && <Route path="mensajes" element={<MessagesPage />} />}
           {!isGuest && <Route path="oportunidades" element={<OpportunityHub />} />}

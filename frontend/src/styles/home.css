@@ -2732,3 +2732,245 @@ body:has(.home-page) {
   .nav-logout-item { width: 100%; }
   .nav-logout-button { width: 100%; padding: 9px 0; text-align: left; }
 }
+
+
+/* Plan Premium: indicadores compactos integrados al perfil existente */
+.premium-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 11px;
+  padding: 6px 11px;
+  border: 1px solid #e2e8f2;
+  border-radius: 20px;
+  background: #f6f8fc;
+  color: #69758a;
+  font-size: 11px;
+  font-weight: 750;
+}
+.premium-plan-chip.is-premium {
+  border-color: #dce5ff;
+  background: #f0f4ff;
+  color: #496bc0;
+}
+.premium-usage-card {
+  margin-top: 19px;
+  padding: 15px 16px;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: #fbfcfe;
+}
+.premium-usage-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.premium-usage-heading strong { color: #344057; font-size: 12px; }
+.premium-usage-heading button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #5279c8;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.premium-usage-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 13px;
+}
+.premium-usage-stats span { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.premium-usage-stats strong { color: #26334b; font-size: 15px; font-weight: 800; }
+.premium-usage-stats small { color: #7b8497; font-size: 10px; line-height: 1.35; }
+.profile-gallery-quota { margin-top: 5px !important; color: #5279c8 !important; font-weight: 700; }
+@media (max-width: 480px) {
+  .premium-usage-card { padding: 13px 12px; }
+  .premium-usage-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 12px; }
+}
+
+
+/* Pantallas de administración y acceso a likes recibidos */
+.premium-lock-card {
+  max-width: 620px;
+  margin: 36px auto;
+  padding: 36px 30px;
+  border: 1px solid #e5ebf7;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #fbfcff, #f3f6fd);
+  text-align: center;
+}
+.premium-lock-icon { display: inline-grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: #eaf0ff; color: #5279c8; font-size: 23px; }
+.premium-lock-card h2 { margin: 12px 0 8px; color: #20283a; font-size: 23px; }
+.premium-lock-card p:not(.discover-eyebrow) { max-width: 440px; margin: 0 auto 20px; color: #68738a; font-size: 14px; line-height: 1.6; }
+.premium-management-section { width: min(100% - 32px, 760px); margin: 0 auto; padding: 28px 0 50px; }
+.premium-back-link { margin-bottom: 24px; padding: 0; border: 0; background: transparent; color: #5279c8; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.premium-management-section > h1 { margin: 4px 0 8px; color: #20283a; font-size: clamp(26px, 4vw, 34px); }
+.premium-management-card { margin-top: 24px; padding: 26px; border: 1px solid #e6ebf3; border-radius: 20px; background: #fff; box-shadow: 0 12px 32px rgba(31,45,72,.06); }
+.premium-management-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+.premium-management-top h2 { margin: 12px 0 0; color: #20283a; font-size: 24px; }
+.premium-management-sparkle { color: #5279c8; font-size: 30px; }
+.premium-management-card > p { color: #68738a; font-size: 14px; line-height: 1.6; }
+.premium-period-label { padding-top: 12px; border-top: 1px solid #edf0f5; }
+.premium-benefits-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 22px 0; }
+.premium-benefits-grid span { padding: 12px; border: 1px solid #edf0f5; border-radius: 11px; color: #46536a; font-size: 12px; line-height: 1.45; }
+.premium-management-actions { padding-top: 18px; border-top: 1px solid #edf0f5; }
+.premium-management-actions .opportunity-primary-button:disabled { opacity: .65; cursor: not-allowed; }
+.premium-payment-note { margin: 12px 0 0; color: #7b8497; font-size: 12px; line-height: 1.55; }
+@media (max-width: 520px) {
+  .premium-lock-card { margin: 20px 12px; padding: 28px 20px; }
+  .premium-management-card { padding: 20px 17px; }
+  .premium-benefits-grid { grid-template-columns: 1fr; }
+}
+
+
+.premium-chat-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 12px;
+  padding: 14px 16px;
+  border: 1px solid #e2e9f8;
+  border-radius: 13px;
+  background: #f7f9ff;
+}
+.premium-chat-prompt strong { color: #344057; font-size: 13px; }
+.premium-chat-prompt p { margin: 4px 0 0; color: #68738a; font-size: 12px; line-height: 1.45; }
+.premium-chat-prompt button { flex: 0 0 auto; padding: 9px 12px; border: 0; border-radius: 9px; background: #5279c8; color: #fff; font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
+@media (max-width: 560px) {
+  .premium-chat-prompt { align-items: flex-start; flex-direction: column; }
+}
+
+
+.professional-premium-invite {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0;
+  padding: 15px 17px;
+  border: 1px solid #e4eafa;
+  border-radius: 14px;
+  background: #f8faff;
+}
+.professional-premium-invite strong { color: #344057; font-size: 13px; }
+.professional-premium-invite p { margin: 5px 0 0; color: #68738a; font-size: 12px; line-height: 1.5; }
+.professional-premium-invite button { flex: 0 0 auto; padding: 9px 13px; border: 0; border-radius: 9px; background: #5279c8; color: #fff; font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
+@media (max-width: 560px) { .professional-premium-invite { align-items: flex-start; flex-direction: column; } }
+
+
+/* Indicador de plan junto a la foto de perfil en la barra superior */
+.navbar-account-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.navbar-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 25px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .55px;
+  white-space: nowrap;
+}
+.navbar-plan-badge.is-free {
+  border-color: #e2e5eb;
+  background: #f1f2f5;
+  color: #737b89;
+}
+.navbar-plan-badge.is-premium {
+  border-color: #e6c66f;
+  background: linear-gradient(135deg, #fff7dc, #f5df9b);
+  color: #87621a;
+  box-shadow: 0 2px 8px rgba(190, 148, 55, .14);
+}
+@media (max-width: 380px) {
+  .navbar-account-summary { gap: 7px; }
+  .navbar-plan-badge { min-height: 23px; padding: 0 8px; font-size: 9px; }
+}
+
+
+/* Modal para avisar que se alcanzó el límite diario de likes */
+.premium-limit-backdrop { z-index: 1100; }
+.premium-limit-modal {
+  position: relative;
+  width: min(100%, 430px);
+  padding: 34px 30px 28px;
+  border: 1px solid #e7ebf3;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 28px 90px rgba(20,32,58,.28);
+  text-align: center;
+}
+.premium-limit-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f3f7;
+  color: #69758a;
+  font-size: 23px;
+  cursor: pointer;
+}
+.premium-limit-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff4e7;
+  color: #c28a35;
+  font-size: 23px;
+}
+.premium-limit-modal .discover-eyebrow { margin: 0 0 8px; }
+.premium-limit-modal h2 {
+  margin: 0;
+  color: #20283a;
+  font-size: clamp(21px, 4vw, 25px);
+  line-height: 1.25;
+}
+.premium-limit-modal > p:not(.discover-eyebrow) {
+  margin: 13px 0 0;
+  color: #68738a;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.premium-limit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 22px;
+}
+.premium-limit-actions button {
+  min-height: 44px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+.premium-limit-upgrade {
+  border: 1px solid #d8b75d;
+  background: linear-gradient(135deg, #fff4d3, #f3dda0);
+  color: #78591b;
+}
+.premium-limit-dismiss {
+  border: 1px solid #e6eaf1;
+  background: #fff;
+  color: #68738a;
+}
+@media (max-width: 480px) {
+  .premium-limit-modal { padding: 31px 22px 23px; }
+}

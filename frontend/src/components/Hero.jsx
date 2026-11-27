@@ -1,13 +1,16 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import gUser from "../assets/images/genericUser.png";
 import { useAuth } from "../context/AuthContext";
 import { profileApi } from "../services/api";
+import { useNavigate } from "react-router";
 
 const emptyForm = { displayName: "", bio: "", city: "", vocalRegister: "", gender: "", languages: "", experience: "", repertoire: "", interests: "" };
 const splitList = (value) => value.split(",").map((item) => item.trim()).filter(Boolean);
 
 const Hero = ({ user }) => {
-  const { token, refreshUser } = useAuth();
+  const { token, refreshUser, refreshSubscription, subscription } = useAuth();
+  const navigate = useNavigate();
+  const isTalent = user?.accountType === "TALENT";
   const mediaInputRef = useRef(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [mediaError, setMediaError] = useState("");
@@ -17,6 +20,10 @@ const Hero = ({ user }) => {
   const [form, setForm] = useState(emptyForm);
   const [deletingMedia, setDeletingMedia] = useState("");
   const [galleryPage, setGalleryPage] = useState(0);
+
+  useEffect(() => {
+    if (isTalent && token) refreshSubscription().catch(() => {});
+  }, [token, isTalent]);
 
   if (!user) return (
     <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
@@ -28,6 +35,9 @@ const Hero = ({ user }) => {
   );
 
   const profile = user.profile || {};
+  const isPremium = Boolean(subscription?.isPremium);
+  const limits = subscription?.limits;
+
   const displayName = profile.displayName || user.username || "Tu perfil";
   const media = profile.media || [];
   const galleryPageSize = 4;
@@ -65,7 +75,7 @@ const Hero = ({ user }) => {
     setMediaError(valid.length !== selected.length ? "Se aceptan JPG, PNG, WEBP, MP4 y WEBM de hasta 50 MB cada uno." : "");
     if (!valid.length) return;
     setUploadingMedia(true);
-    try { for (const file of valid) await profileApi.uploadMedia(token, file); await refreshUser(); }
+    try { for (const file of valid) await profileApi.uploadMedia(token, file); await refreshUser(); await refreshSubscription(); }
     catch (error) { setMediaError(error.message || "No se pudo subir el archivo."); }
     finally { setUploadingMedia(false); }
   }
@@ -73,7 +83,7 @@ const Hero = ({ user }) => {
   async function removeMedia(item) {
     if (!window.confirm("¿Querés eliminar este archivo de tu galería?")) return;
     setDeletingMedia(item.id); setMediaError("");
-    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); setGalleryPage(0); }
+    try { await profileApi.deleteMedia(token, item.id); await refreshUser(); await refreshSubscription(); setGalleryPage(0); }
     catch (error) { setMediaError(error.message || "No se pudo eliminar el archivo."); }
     finally { setDeletingMedia(""); }
   }
@@ -83,6 +93,16 @@ const Hero = ({ user }) => {
       <article className="profile-preview profile-preview-expanded">
         <div className="profile-content">
           <p className="profile-eyebrow">Mi perfil</p><h1>{displayName}</h1><p className="profile-username">@{user.username}</p>
+          {isTalent && <div className={`premium-plan-chip ${isPremium ? "is-premium" : ""}`}>{isPremium ? "✦ Linkea Premium" : "Plan gratuito"}</div>}
+          {isTalent && limits && <section className="premium-usage-card" aria-label="Uso de tu plan">
+            <div className="premium-usage-heading"><strong>Tu plan</strong><button type="button" onClick={() => navigate("/home/plan")}>Administrar plan <span aria-hidden="true">→</span></button></div>
+            <div className="premium-usage-stats">
+              <span><strong>{subscription.usage?.dailyLikes ?? 0}/{limits.dailyLikes}</strong><small>Me gusta hoy</small></span>
+              <span><strong>{subscription.usage?.activeApplications ?? 0}/{limits.simultaneousApplications}</strong><small>Convocatorias activas</small></span>
+              <span><strong>{(subscription.usage?.photos ?? media.filter((item) => item.type !== "video").length)}/{limits.photos}</strong><small>Fotos</small></span>
+              <span><strong>{(subscription.usage?.videos ?? media.filter((item) => item.type === "video").length)}/{limits.videos}</strong><small>Videos</small></span>
+            </div>
+          </section> }
           {profile.city && <p className="profile-city">{profile.city}</p>}
           {profile.vocalRegister && <p className="profile-vocal-register">Registro vocal: <strong>{profile.vocalRegister}</strong></p>}
           {profile.bio && <p className="profile-bio">{profile.bio}</p>}
@@ -113,7 +133,7 @@ const Hero = ({ user }) => {
         </form>}
 
         <section className="profile-gallery">
-          <div className="profile-gallery-heading"><div><h2>Mi galería</h2><p>Compartí fotos y videos de tu trabajo artístico.</p></div>
+          <div className="profile-gallery-heading"><div><h2>Mi galería</h2><p>Compartí fotos y videos de tu trabajo artístico.</p>{isTalent && limits && <p className="profile-gallery-quota">{(subscription.usage?.photos ?? media.filter((item) => item.type !== "video").length)}/{limits.photos} fotos · {(subscription.usage?.videos ?? media.filter((item) => item.type === "video").length)}/{limits.videos} videos utilizados</p>}</div>
             <button type="button" className="profile-photo-button" onClick={() => mediaInputRef.current?.click()} disabled={uploadingMedia}>{uploadingMedia ? "Subiendo..." : "Agregar archivos"}</button>
             <input ref={mediaInputRef} className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple onChange={handleMediaChange} />
           </div>

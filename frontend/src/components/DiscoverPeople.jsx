@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { discoveryApi, favoritesApi, invitationsApi, likesApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
@@ -7,12 +8,14 @@ const initialFilters = { vocalRegister: "", minAge: "", maxAge: "", city: "" };
 
 function DiscoverPeople() {
   const { token, isGuest, user } = useAuth();
+  const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [people, setPeople] = useState([]);
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [likeError, setLikeError] = useState("");
+  const [dailyLimitModalOpen, setDailyLimitModalOpen] = useState(false);
   const [notice, setNotice] = useState("");
   const [likingIds, setLikingIds] = useState([]);
   const [filters, setFilters] = useState(initialFilters);
@@ -148,7 +151,13 @@ function DiscoverPeople() {
         ? `¡Es un match con @${person.username}! Ya pueden empezar a conversar.`
         : `¡Le diste like a @${person.username}!`);
     } catch (err) {
-      setLikeError(err.message || "No pudimos enviar el like. Intentá nuevamente.");
+      if (err.code === "DAILY_LIKE_LIMIT") {
+        setLikeError("");
+        setSelectedPerson(null);
+        setDailyLimitModalOpen(true);
+      } else {
+        setLikeError(err.message || "No pudimos enviar el like. Intentá nuevamente.");
+      }
     } finally {
       setLikingIds((current) => current.filter((id) => id !== person.id));
     }
@@ -263,6 +272,22 @@ function DiscoverPeople() {
           <button type="button" className="discover-load-more" onClick={() => setOffset((current) => current + 50)} disabled={loadingMore}>
             {loadingMore ? "Cargando perfiles..." : "Cargar más perfiles"}
           </button>
+        </div>
+      )}
+
+      {dailyLimitModalOpen && (
+        <div className="discover-modal-backdrop premium-limit-backdrop" role="presentation" onClick={() => setDailyLimitModalOpen(false)}>
+          <section className="premium-limit-modal" role="dialog" aria-modal="true" aria-labelledby="daily-limit-title" onClick={(event) => event.stopPropagation()}>
+            <button className="premium-limit-close" type="button" onClick={() => setDailyLimitModalOpen(false)} aria-label="Cerrar">×</button>
+            <div className="premium-limit-icon" aria-hidden="true">♥</div>
+            <p className="discover-eyebrow">Límite diario alcanzado</p>
+            <h2 id="daily-limit-title">¡Por hoy ya diste todos tus likes!</h2>
+            <p>Tu plan gratuito permite enviar 5 Me gusta por día. Podés volver mañana o pasar a Linkea Premium para enviar hasta 20.</p>
+            <div className="premium-limit-actions">
+              <button type="button" className="premium-limit-upgrade" onClick={() => { setDailyLimitModalOpen(false); navigate("/home/plan"); }}>Conocer Premium</button>
+              <button type="button" className="premium-limit-dismiss" onClick={() => setDailyLimitModalOpen(false)}>Entendido</button>
+            </div>
+          </section>
         </div>
       )}
 

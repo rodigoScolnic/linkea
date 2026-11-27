@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
+import { getUserEntitlements } from "../services/user-entitlements.js";
 
 const router = Router();
 const genders = ["Masculino", "Femenino", "Prefiero no contestar"];
@@ -64,6 +65,35 @@ async function uploadToStorage(req, res, next, kind) {
     if (!extension || !Buffer.isBuffer(req.body) || req.body.length === 0) {
       return res.status(400).json({ error: kind === "photo" ? "Seleccioná una imagen JPG, PNG o WEBP." : "Formato no válido. Usá JPG, PNG, WEBP, MP4 o WEBM." });
     }
+    // The avatar endpoint (/photo) is a single profile-picture slot.
+    // Portfolio quotas apply to uploaded media items (/media).
+    if (kind === "media") {
+      const entitlementResult = await getUserEntitlements(req.user.id);
+      if (!entitlementResult) return res.status(404).json({ error: "Usuario no encontrado." });
+
+      if (entitlementResult.user.accountType === "TALENT") {
+        const isVideo = contentType.startsWith("video/");
+        const mediaType = isVideo ? "video" : "image";
+        const limit = isVideo
+          ? entitlementResult.entitlements.limits.videos
+          : entitlementResult.entitlements.limits.photos;
+        const used = await prisma.profileMedia.count({
+          where: { type: mediaType, profile: { is: { userId: req.user.id } } }
+        });
+
+        if (used >= limit) {
+          return res.status(429).json({
+            code: isVideo ? "VIDEO_LIMIT" : "PHOTO_LIMIT",
+            error: isVideo
+              ? `Tu plan permite hasta ${limit} video(s) en el portfolio. Pasate a Premium para subir hasta 5.`
+              : `Tu plan permite hasta ${limit} foto(s) en el portfolio. Pasate a Premium para subir hasta 10.`,
+            limit,
+            used
+          });
+        }
+      }
+    }
+
     const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, "");
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const bucket = process.env.SUPABASE_STORAGE_BUCKET || "linkea-avatars";

@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import genericUser from "../assets/images/genericUser.png";
 
 function ProfessionalHub() {
-  const { token, user } = useAuth();
+  const { token, user, subscription } = useAuth();
   const navigate = useNavigate();
   const isInstitution = user?.accountType === "INSTITUTION";
   const [invitations, setInvitations] = useState([]);
@@ -67,6 +67,7 @@ function ProfessionalHub() {
         <button type="button" className="professional-refresh-button" onClick={loadInvitations} disabled={loading}>Actualizar</button>
       </div>
 
+      {!isInstitution && !subscription?.isPremium && <div className="professional-premium-invite"><div><strong>¿Querés contactar instituciones por tu cuenta?</strong><p>Con Linkea Premium podés iniciar conversaciones con compañías e instituciones, sin esperar una invitación.</p></div><button type="button" onClick={() => navigate("/home/plan")}>Conocer Premium</button></div>}
       {notice && <p className="professional-notice" role="status">{notice}</p>}
       {error && <p className="discover-status discover-error" role="alert">{error}</p>}
 
