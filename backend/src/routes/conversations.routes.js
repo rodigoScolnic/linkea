@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "../db.js";
 import { requireAuth } from "../middleware/auth.js";
 import { getIO } from "../realtime.js";
+import { getUserEntitlements } from "../services/user-entitlements.js";
 
 const router = Router();
 
@@ -113,6 +114,36 @@ router.post("/:id/messages", requireAuth, async (req, res, next) => {
     if (!conversation) return res.status(404).json({ error: "Conversación no encontrada." });
     const recipientId = getOtherParticipant(conversation, req.user.id);
     if (!recipientId) return res.status(400).json({ error: "No se pudo identificar al destinatario." });
+
+    const senderResult = await getUserEntitlements(req.user.id);
+    if (!senderResult) return res.status(404).json({ error: "Usuario no encontrado." });
+
+    const recipient = await prisma.user.findUnique({
+      where: { id: recipientId },
+      select: { id: true, accountType: true }
+    });
+    if (!recipient) return res.status(404).json({ error: "Destinatario no encontrado." });
+
+    if (
+      senderResult.user.accountType === "TALENT"
+      && recipient.accountType === "INSTITUTION"
+      && !senderResult.entitlements.limits.canInitiateInstitutionChats
+    ) {
+      // An institution-created invitation counts as the institution making first contact.
+      const institutionInvited = conversation.invitation?.institutionId === recipientId;
+      const institutionAlreadyMessaged = institutionInvited || await prisma.message.findFirst({
+        where: { conversationId: id, senderId: recipientId },
+        select: { id: true }
+      });
+
+      if (!institutionAlreadyMessaged) {
+        return res.status(403).json({
+          code: "PREMIUM_REQUIRED",
+          feature: "initiate_institution_chats",
+          error: "Con el plan gratuito podés responder a instituciones que te escriban primero. Premium te permite iniciar la conversación."
+        });
+      }
+    }
 
     const result = await prisma.$transaction(async (tx) => {
       const message = await tx.message.create({
