@@ -46,7 +46,7 @@ export function AuthProvider({ children }) {
     let cancelled = false;
     if (!token || isGuest) { setSubscription(null); return undefined; }
     subscriptionApi.me(token)
-      .then((response) => { if (!cancelled) setSubscription(response.subscription); })
+      .then((response) => { if (!cancelled) setSubscription({ ...response.subscription, usage: response.usage }); })
       .catch(() => { if (!cancelled) setSubscription(null); });
     return () => { cancelled = true; };
   }, [token, isGuest]);
@@ -54,8 +54,8 @@ export function AuthProvider({ children }) {
   async function refreshSubscription() {
     if (!token) return null;
     const response = await subscriptionApi.me(token);
-    setSubscription(response.subscription);
-    return response.subscription;
+    setSubscription({ ...response.subscription, usage: response.usage });
+    return { ...response.subscription, usage: response.usage };
   }
 
   function saveSession(response) {
