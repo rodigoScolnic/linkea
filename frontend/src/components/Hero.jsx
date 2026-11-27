@@ -12,6 +12,7 @@ const Hero = ({ user }) => {
   const { token, refreshUser, subscription } = useAuth();
   const navigate = useNavigate();
   const [usage, setUsage] = useState({ likes: 0, applications: 0, loading: true });
+  const isTalent = user?.accountType === "TALENT";
   const mediaInputRef = useRef(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [mediaError, setMediaError] = useState("");
@@ -49,7 +50,6 @@ const Hero = ({ user }) => {
   );
 
   const profile = user.profile || {};
-  const isTalent = user.accountType === "TALENT";
   const isPremium = Boolean(subscription?.isPremium);
   const limits = subscription?.limits;
 
