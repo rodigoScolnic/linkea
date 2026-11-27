@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
 import gUser from "../assets/images/genericUser.png";
 import { useAuth } from "../context/AuthContext";
-import { likesApi, opportunitiesApi, profileApi } from "../services/api";
+import { profileApi } from "../services/api";
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
 
 const emptyForm = { displayName: "", bio: "", city: "", vocalRegister: "", gender: "", languages: "", experience: "", repertoire: "", interests: "" };
 const splitList = (value) => value.split(",").map((item) => item.trim()).filter(Boolean);
@@ -11,7 +10,6 @@ const splitList = (value) => value.split(",").map((item) => item.trim()).filter(
 const Hero = ({ user }) => {
   const { token, refreshUser, subscription } = useAuth();
   const navigate = useNavigate();
-  const [usage, setUsage] = useState({ likes: 0, applications: 0, loading: true });
   const isTalent = user?.accountType === "TALENT";
   const mediaInputRef = useRef(null);
   const [uploadingMedia, setUploadingMedia] = useState(false);
@@ -22,23 +20,6 @@ const Hero = ({ user }) => {
   const [form, setForm] = useState(emptyForm);
   const [deletingMedia, setDeletingMedia] = useState("");
   const [galleryPage, setGalleryPage] = useState(0);
-
-  useEffect(() => {
-    let active = true;
-    if (!isTalent || !token) return undefined;
-    Promise.all([likesApi.listSent(token), opportunitiesApi.list(token)])
-      .then(([likesData, opportunitiesData]) => {
-        const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Argentina/Buenos_Aires", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
-        const date = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-        const dayStart = new Date(`${date.year}-${date.month}-${date.day}T03:00:00.000Z`);
-        const likes = (likesData.likes || []).filter((like) => new Date(like.createdAt) >= dayStart).length;
-        const activeStatuses = new Set(["SUBMITTED", "REVIEWING", "SELECTED"]);
-        const applications = (opportunitiesData.opportunities || []).reduce((total, opportunity) => total + (opportunity.applications || []).filter((application) => activeStatuses.has(application.status)).length, 0);
-        if (active) setUsage({ likes, applications, loading: false });
-      })
-      .catch(() => { if (active) setUsage((current) => ({ ...current, loading: false })); });
-    return () => { active = false; };
-  }, [isTalent, token, user?.profile?.media?.length]);
 
   if (!user) return (
     <section className="hero" id="mi-perfil"><article className="profile-preview guest-preview">
@@ -112,10 +93,10 @@ const Hero = ({ user }) => {
           {isTalent && limits && <section className="premium-usage-card" aria-label="Uso de tu plan">
             <div className="premium-usage-heading"><strong>Tu plan</strong><button type="button" onClick={() => navigate("/home/plan")}>Administrar plan <span aria-hidden="true">→</span></button></div>
             <div className="premium-usage-stats">
-              <span><strong>{usage.loading ? "—" : usage.likes}/{limits.dailyLikes}</strong><small>Me gusta hoy</small></span>
-              <span><strong>{usage.loading ? "—" : usage.applications}/{limits.simultaneousApplications}</strong><small>Convocatorias activas</small></span>
-              <span><strong>{media.filter((item) => item.type !== "video").length}/{limits.photos}</strong><small>Fotos</small></span>
-              <span><strong>{media.filter((item) => item.type === "video").length}/{limits.videos}</strong><small>Videos</small></span>
+              <span><strong>{subscription.usage?.dailyLikes ?? 0}/{limits.dailyLikes}</strong><small>Me gusta hoy</small></span>
+              <span><strong>{subscription.usage?.activeApplications ?? 0}/{limits.simultaneousApplications}</strong><small>Convocatorias activas</small></span>
+              <span><strong>{(subscription.usage?.photos ?? media.filter((item) => item.type !== "video").length)}/{limits.photos}</strong><small>Fotos</small></span>
+              <span><strong>{(subscription.usage?.videos ?? media.filter((item) => item.type === "video").length)}/{limits.videos}</strong><small>Videos</small></span>
             </div>
           </section> }
           {profile.city && <p className="profile-city">{profile.city}</p>}
@@ -148,7 +129,7 @@ const Hero = ({ user }) => {
         </form>}
 
         <section className="profile-gallery">
-          <div className="profile-gallery-heading"><div><h2>Mi galería</h2><p>Compartí fotos y videos de tu trabajo artístico.</p>{isTalent && limits && <p className="profile-gallery-quota">{media.filter((item) => item.type !== "video").length}/{limits.photos} fotos · {media.filter((item) => item.type === "video").length}/{limits.videos} videos utilizados</p>}</div>
+          <div className="profile-gallery-heading"><div><h2>Mi galería</h2><p>Compartí fotos y videos de tu trabajo artístico.</p>{isTalent && limits && <p className="profile-gallery-quota">{(subscription.usage?.photos ?? media.filter((item) => item.type !== "video").length)}/{limits.photos} fotos · {(subscription.usage?.videos ?? media.filter((item) => item.type === "video").length)}/{limits.videos} videos utilizados</p>}</div>
             <button type="button" className="profile-photo-button" onClick={() => mediaInputRef.current?.click()} disabled={uploadingMedia}>{uploadingMedia ? "Subiendo..." : "Agregar archivos"}</button>
             <input ref={mediaInputRef} className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" multiple onChange={handleMediaChange} />
           </div>
