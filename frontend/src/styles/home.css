@@ -2860,3 +2860,39 @@ body:has(.home-page) {
 .professional-premium-invite p { margin: 5px 0 0; color: #68738a; font-size: 12px; line-height: 1.5; }
 .professional-premium-invite button { flex: 0 0 auto; padding: 9px 13px; border: 0; border-radius: 9px; background: #5279c8; color: #fff; font: inherit; font-size: 11px; font-weight: 750; cursor: pointer; }
 @media (max-width: 560px) { .professional-premium-invite { align-items: flex-start; flex-direction: column; } }
+
+
+/* Indicador de plan junto a la foto de perfil en la barra superior */
+.navbar-account-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.navbar-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 25px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .55px;
+  white-space: nowrap;
+}
+.navbar-plan-badge.is-free {
+  border-color: #e2e5eb;
+  background: #f1f2f5;
+  color: #737b89;
+}
+.navbar-plan-badge.is-premium {
+  border-color: #e6c66f;
+  background: linear-gradient(135deg, #fff7dc, #f5df9b);
+  color: #87621a;
+  box-shadow: 0 2px 8px rgba(190, 148, 55, .14);
+}
+@media (max-width: 380px) {
+  .navbar-account-summary { gap: 7px; }
+  .navbar-plan-badge { min-height: 23px; padding: 0 8px; font-size: 9px; }
+}
