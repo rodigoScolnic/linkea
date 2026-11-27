@@ -117,6 +117,8 @@ function Navbar() {
     { to: "/home/perfil", label: "Mi perfil" },
     { to: "/home/descubrir", label: isInstitution ? "Descubrir talentos" : "Descubrir" },
     ...(!isGuest ? [{ to: isInstitution ? "/home/favoritos" : "/home/likes", label: isInstitution ? "Talentos guardados" : "Mis likes" }] : []),
+    ...(!isGuest && !isInstitution ? [{ to: "/home/likes-recibidos", label: "Likes recibidos" }] : []),
+    ...(!isGuest ? [{ to: "/home/plan", label: "Mi plan" }] : []),
     ...(!isGuest ? [
       { to: "/home/contactos", label: "Contactos profesionales" },
       { to: "/home/mensajes", label: "Mensajes", messages: true },
