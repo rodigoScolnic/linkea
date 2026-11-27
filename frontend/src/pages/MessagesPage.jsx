@@ -42,6 +42,7 @@ function MessagesPage() {
   const [hasMore, setHasMore] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [premiumPrompt, setPremiumPrompt] = useState(false);
   const [connection, setConnection] = useState("connecting");
   const socketRef = useRef(null);
   const bottomRef = useRef(null);
@@ -198,13 +199,18 @@ function MessagesPage() {
     if (!content || !selectedId || sending) return;
     setSending(true);
     setError("");
+    setPremiumPrompt(false);
     const socket = socketRef.current;
     try {
       if (socket?.connected) {
         const result = await new Promise((resolve, reject) => {
           socket.timeout(10000).emit("message:send", { conversationId: selectedId, content }, (timeoutError, response) => {
             if (timeoutError) return reject(new Error("El servidor tardó demasiado en responder."));
-            if (!response?.ok) return reject(new Error(response?.error || "No se pudo enviar el mensaje."));
+            if (!response?.ok) {
+              const sendError = new Error(response?.error || "No se pudo enviar el mensaje.");
+              sendError.code = response?.code;
+              return reject(sendError);
+            }
             resolve(response);
           });
         });
@@ -216,7 +222,12 @@ function MessagesPage() {
       setDraft("");
       await loadConversations();
     } catch (err) {
-      setError(err.message || "No pudimos enviar el mensaje.");
+      if (err.code === "PREMIUM_REQUIRED") {
+        setPremiumPrompt(true);
+        setError("");
+      } else {
+        setError(err.message || "No pudimos enviar el mensaje.");
+      }
     } finally {
       setSending(false);
     }
@@ -311,6 +322,10 @@ function MessagesPage() {
                 <img src={selectedPerson?.profile?.photoUrl || selectedPerson?.institutionProfile?.logoUrl || genericUser} alt="" />
                 <div><strong>{personName(selectedPerson)}</strong><small>{selectedConversation.invitation ? "Contacto profesional" : "Match"}</small></div>
               </header>
+              {premiumPrompt && <div className="premium-chat-prompt" role="status">
+                <div><strong>Iniciá conversaciones con instituciones</strong><p>Con Linkea Premium podés escribir primero a instituciones y ampliar tus oportunidades profesionales.</p></div>
+                <button type="button" onClick={() => window.location.assign("/home/plan")}>Conocer Premium</button>
+              </div>}
               <div className="messages-thread" aria-live="polite">
                 {hasMore && (
                   <button type="button" className="messages-load-older" onClick={loadOlderMessages} disabled={loadingOlder}>
